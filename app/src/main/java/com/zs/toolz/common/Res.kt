@@ -108,7 +108,7 @@ object Res {
     // Typealiases for direct access to Android resources (R.string, R.drawable, etc.)
     typealias string = com.zs.toolz.R.string
     typealias drawable = com.zs.toolz.R.drawable
-    typealias raw = com.zs.toolz.R.raw
+    // typealias raw = com.zs.toolz.R.raw
     // typealias plurals = com.zs.toolz.R.plurals
 
     /**

@@ -21,8 +21,8 @@ import com.zs.compose.theme.snackbar.SnackbarHostState
 import com.zs.compose.theme.snackbar.SnackbarResult
 import com.zs.domain.analytics.Analytics
 import com.zs.domain.util.showPlatformToast
-import com.zs.toolz.common.Res
 import com.zs.preferences.Preferences
+import com.zs.toolz.common.Res
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -97,7 +97,7 @@ abstract class KoinViewModel : ScopeViewModel() {
             }
         },
         action = getText(Res.string.report),
-        icon = Res.drawable.ic_sharp_oct_outline_error,
+        icon = Res.drawable.ic_error_outline,
         accent = Color.OrientRed,
         duration = SnackbarDuration.Indefinite
     )
