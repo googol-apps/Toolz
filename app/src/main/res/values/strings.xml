@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Toolz</string>
+    <string name="error">Error</string>
+    <string name="report">Report</string>
+    <string name="msg_unknown_error">Oops!! Something went wrong.</string>
 </resources>

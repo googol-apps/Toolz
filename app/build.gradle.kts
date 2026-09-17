@@ -25,6 +25,7 @@ plugins {
     // ⚠️ Currently Crashlytics + Google Services are applied globally.
     alias(libs.plugins.crashanlytics) // Firebase Crashlytics (should be flavor-scoped)
     alias(libs.plugins.google.services) // Google Services (should be flavor-scoped)
+    alias(libs.plugins.kotlin.serialization) // 1. Apply the plugin
 }
 
 
@@ -161,6 +162,8 @@ dependencies {
     implementation(libs.androidx.koin)
     implementation(libs.lottie.compose)
     implementation(libs.bundles.coil)
+    implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.protobuf)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

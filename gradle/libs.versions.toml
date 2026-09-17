@@ -21,6 +21,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 ksp = { id = "com.google.devtools.ksp", version = "2.3.4" }
 google-services = { id = "com.google.gms.google-services", version = "4.5.0" }
 crashanlytics = { id = "com.google.firebase.crashlytics", version = "3.0.8" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 [libraries]
 # ─── Core AndroidX - Essential AndroidX components for base functionality ───
@@ -102,6 +103,10 @@ glance-material3 = { module = "androidx.glance:glance-material3", version.ref = 
 # Paging
 androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version = "3.5.1" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version = "3.5.1" }
+
+
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version = "1.11.0" }
+kotlinx-serialization-protobuf = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-protobuf", version = "1.11.0" }
 
 
 [bundles]
