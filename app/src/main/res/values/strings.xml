@@ -3,4 +3,489 @@
     <string name="error">Error</string>
     <string name="report">Report</string>
     <string name="msg_unknown_error">Oops!! Something went wrong.</string>
+    <string name="units">Units</string>
+    <string name="level">Level</string>
+    <string name="chatbot">Chatbot</string>
+    <string name="compass">Compass</string>
+
+    <!--Unit Converter-->
+    <string name="length">Length</string>
+
+    <!--Units of Length with corresponding shorter codes-->
+    <string name="nanometre">Nanometre</string>
+    <string name="code_nanometre">nm</string>
+
+    <string name="micrometre">Micrometre (Micron)</string>
+    <string name="code_micrometre">µm</string>
+
+    <string name="millimetre">Millimetre</string>
+    <string name="code_millimetre">mm</string>
+
+    <string name="centimetre">Centimetre</string>
+    <string name="code_centimetre">cm</string>
+
+    <string name="metre">Metre</string>
+    <string name="code_metre">m</string>
+
+    <string name="kilometre">Kilometre</string>
+    <string name="code_kilometre">km</string>
+
+    <string name="mile">Mile</string>
+    <string name="code_mile">mi</string>
+
+    <string name="nautical_mile">Nautical Mile</string>
+    <string name="code_nautical_mile">nmi</string>
+
+    <string name="yard">Yard</string>
+    <string name="code_yard">yd</string>
+
+    <string name="foot">Foot</string>
+    <string name="code_foot">ft</string>
+
+    <string name="inch">Inch</string>
+    <string name="code_inch">in</string>
+
+    <string name="astronomical_unt">Astronomical Unit</string>
+    <string name="code_astronomical_unit">au</string>
+
+    <string name="light_year">Light Year</string>
+    <string name="code_light_year">ly</string>
+
+    <!--Unit of speed with corresponding shorter codes-->
+
+    <string name="speed">Speed</string>
+
+    <string name="kilometres_per_hour">Kilometer/hour</string>
+    <string name="code_kilometres_per_hour">k/s</string>
+
+    <string name="centimetres_per_second">Centimetre/second</string>
+    <string name="code_centimetres_per_second">cm/s</string>
+
+    <string name="miles_per_hour">Mile/hour</string>
+    <string name="code_miles_per_hour">mph</string>
+
+    <string name="metres_per_second">Meter/second</string>
+    <string name="code_metres_per_second">m/s</string>
+
+    <string name="knot">Knot</string>
+    <string name="code_knot">kn</string>
+
+    <string name="mach">Mach</string>
+    <string name="code_mach">M</string>
+
+    <string name="feet_per_second">Foot/Second</string>
+    <string name="code_feet_per_second">ft/s</string>
+
+    <!--Unit of angle with corresponding shorter codes-->
+    <string name="angle">Angle</string>
+
+    <string name="degrees">Degree</string>
+    <string name="code_degrees">°</string>
+
+    <string name="radian">Radian</string>
+    <string name="code_radian">rad</string>
+
+    <string name="gradian">Gradian</string>
+    <string name="code_gradian">grad</string>
+
+    <!--Unit of Volume with corresponding shorter codes-->
+    <string name="volume">Volume</string>
+
+    <string name="millilitres">Millilitre</string>
+    <string name="code_millilitres">ml</string>
+
+    <string name="cbc_centimetres">Cubic centimetre</string>
+    <string name="code_cubic_centimetres">cm\u00B3</string>
+
+    <string name="litres">Litre</string>
+    <string name="code_litres">l</string>
+
+    <string name="cbc_metres">Cubic Metre</string>
+    <string name="code_cubic_metres">m\u00B3</string>
+
+    <string name="teaspoon_us">Teapoon(US)</string>
+    <string name="code_teaspoon_us">tsp (US)</string>
+
+    <string name="tablespoon_us">Tablespoon (US)</string>
+    <string name="code_tablespoon_us">tbsp (US)</string>
+
+    <string name="fluid_ounce_us">Fluid ounce (US)</string>
+    <string name="code_fluid_ounce_us">fl oz (US)</string>
+
+    <string name="cups_us">Cup (US)</string>
+    <string name="code_cups_us">cp (US)</string>
+
+    <string name="pints_us">Pint (US)</string>
+    <string name="code_pints_us">pt (US)</string>
+
+    <string name="quarts_us">Quart (US)</string>
+    <string name="code_quarts_us">qt (US)</string>
+
+    <string name="gallons_us">Gallon (US)</string>
+    <string name="code_gallons_us">gal (US)</string>
+
+    <string name="cbc_inches">Cubic Inch</string>
+    <string name="code_cubic_inches">in\u00B3</string>
+
+    <string name="cbc_yards">Cubic yard</string>
+    <string name="code_cubic_yard">yd\u00B3</string>
+
+    <string name="teaspoon_uk">Teaspoon (UK)</string>
+    <string name="code_teaspoon_uk">tspn (UK)</string>
+
+    <string name="tablespoon_uk">Tablespoon (UK)</string>
+    <string name="code_tablespoon_uk">tbsp (UK)</string>
+
+    <string name="fluid_ounce_uk">Fluid ounce (UK)</string>
+    <string name="code_fluid_ounce_uk"> fl oz (UK) </string>
+
+    <string name="pints_uk">Pint (UK)</string>
+    <string name="code_pint_uk">pt (UK)</string>
+
+    <string name="quarts_uk">Quart (UK)</string>
+    <string name="code_quarts_uk">qt (UK)</string>
+
+    <string name="gallons_uk">Gallon (UK)</string>
+    <string name="code_gallons_uk">gal (UK)</string>
+
+    <string name="barrels">Barrel</string>
+
+
+    <!--Unit of temperature with corresponding shorter codes-->
+    <string name="temperature">Temperature</string>
+
+    <string name="celsius">Celsius</string>
+    <string name="code_celsius">°C</string>
+
+    <string name="fahrenheit">Fahrenheit</string>
+    <string name="code_fahrenheit">°F</string>
+
+    <string name="kelvin">Kelvin</string>
+    <string name="code_kelvin">K</string>
+
+    <string name="rankine">Rankine</string>
+    <string name="code_rankine">°R</string>
+
+    <string name="delisle">Delisle</string>
+    <string name="code_delisle">°De</string>
+
+    <string name="newton">Newton</string>
+    <string name="code_newton">°N</string>
+
+    <string name="reaumur">Réaumur</string>
+    <string name="code_reaumur">°Ré</string>
+
+    <string name="romer">Rømer</string>
+    <string name="code_romer">°Rø</string>
+
+    <!--Unit of mass with corresponding shorter codes-->
+    <string name="weight_and_mass">Weight &amp; Mass</string>
+    <string name="carat">Carat</string>
+    <string name="code_carat">ct</string>
+
+    <string name="milligram">Milligram</string>
+    <string name="code_milligram">mg</string>
+
+    <string name="centigram">Centigram</string>
+    <string name="code_centigram">cg</string>
+
+    <string name="decigram">Decigram</string>
+    <string name="code_decigram">dg</string>
+
+    <string name="kilogram">Kilogram</string>
+    <string name="code_kilogram">kg</string>
+
+    <string name="pound">Pound</string>
+    <string name="code_pound">lb</string>
+
+    <string name="gram">Gram</string>
+    <string name="code_gram">g</string>
+
+    <string name="decagram">Decagram</string>
+    <string name="code_decagram">dg</string>
+
+    <string name="hectogram">Hectogram</string>
+    <string name="code_hectogram">hg</string>
+
+    <string name="ounce">Ounce</string>
+    <string name="code_ounce">oz</string>
+
+    <string name="stone">Stone</string>
+    <string name="code_stone">st</string>
+
+    <string name="metric_ton">Ton (metric)</string>
+    <string name="code_metric_ton">t</string>
+
+    <string name="short_ton">Ton (US/short)</string>
+    <string name="code_short_ton">t (US)</string>
+
+    <string name="long_ton">Ton (UK/long)</string>
+    <string name="code_long_ton">t (UK)</string>
+
+    <!--Unit of energy with corresponding shorter codes-->
+    <string name="energy">Energy</string>
+
+    <string name="electron_volt">Electron Volt</string>
+    <string name="code_electron_volt">eV</string>
+
+    <string name="joule">Joule</string>
+    <string name="code_joule">J</string>
+
+    <string name="kilojoule">Kilojoule</string>
+    <string name="code_kilojoule">kJ</string>
+
+    <string name="thermal_calorie">Thermal Calorie</string>
+    <string name="code_thermal_calorie">TCal</string>
+
+    <string name="food_calorie">Food Calorie</string>
+    <string name="code_food_calorie">Cal</string>
+
+    <string name="british_thermal_units">British Thermal Unit</string>
+    <string name="code_british_thermal_units">BTU</string>
+
+    <string name="foot_pound">Foot_Pound</string>
+    <string name="code_foot_pound">ft-lb</string>
+
+    <!--Unit of Area with corresponding shorter codes-->
+    <string name="area">Area</string>
+
+    <string name="sq_millimetres">Square Millimetre</string>
+    <string name="code_sq_millimetres">mm\u002</string>
+
+    <string name="sq_centimetres">Square Centimetre</string>
+    <string name="code_sq_centimetres">cm\u002</string>
+
+    <string name="sq_metres">Square Metre</string>
+    <string name="code_sq_metres">m\u002</string>
+
+
+    <string name="hectare">Hectare</string>
+    <string name="code_hectare">ha</string>
+
+    <string name="sq_kilometre">Square Kilometre</string>
+    <string name="code_sq_kilometre">km\u002</string>
+
+    <string name="sq_inche">Square Inche</string>
+    <string name="code_sq_inche">in\u002</string>
+
+    <string name="sq_foot">Square Foot</string>
+    <string name="code_sq_foot">ft\u002</string>
+
+    <string name="sq_yard">Square Yard</string>
+    <string name="code_sq_yard">yd\u002</string>
+
+    <string name="acre">Acre</string>
+    <string name="code_acre">a</string>
+
+    <string name="sq_mile">Square Mile</string>
+    <string name="code_sq_mile">mi\u002</string>
+
+    <!--Unit of Pressure with corresponding shorter codes-->
+    <string name="pressure">Pressure</string>
+
+    <string name="atmosphere">Atmosphere</string>
+    <string name="code_atmosphere">atm</string>
+
+    <string name="bar">Bar</string>
+    <string name="code_bar">ba</string>
+
+    <string name="kilopascal">Kilopascal</string>
+    <string name="code_kilopascal">kPa</string>
+
+    <string name="mm_of_mercury">Millimetre of Mercury</string>
+    <string name="code_mm_of_mercury">mm Hg</string>
+
+    <string name="pascal">Pascal</string>
+    <string name="code_pascal">Pa</string>
+
+    <string name="pounds_per_inch">Pound per Inch</string>
+    <string name="code_pounds_per_inch">Psi</string>
+
+    <!--Unit of Power with corresponding shorter codes-->
+    <string name="power">Power</string>
+
+    <string name="watt">Watt</string>
+    <string name="code_watt">W</string>
+
+    <string name="kilowatt">Kilowatt</string>
+    <string name="code_kilowatt">kW</string>
+
+    <string name="horse_power_us">Horse power (US)</string>
+    <string name="code_horse_power_us">hp(US)</string>
+
+    <string name="foot_pounds_per_minute">Foot-Pound/minute</string>
+    <string name="code_foot_pounds_per_minute">ft.lb/m</string>
+
+    <string name="british_thermal_units_per_minute">BTU/minute</string>
+    <string name="code_british_thermal_units_per_minute">BTU/m</string>
+
+
+    <!--Unit of mass with corresponding shorter codes-->
+    <string name="time">Time</string>
+
+    <string name="microsecond">Microsecond</string>
+    <string name="code_microsecond">µs</string>
+
+    <string name="millisecond">Millisecond</string>
+    <string name="code_millisecond">ms</string>
+
+    <string name="second">Second</string>
+    <string name="code_second">s</string>
+
+    <string name="minute">Minute</string>
+    <string name="code_minute">m</string>
+
+    <string name="hour">Hour</string>
+    <string name="code_hour">h</string>
+
+    <string name="day">Day</string>
+    <string name="code_day">d</string>
+
+    <string name="week">Week</string>
+    <string name="code_week">wk</string>
+
+    <string name="year">Year</string>
+    <string name="code_year">yr</string>
+
+    <string name="nanosecond">Nanosecond</string>
+    <string name="code_nanosecond">ns</string>
+
+    <!--Unit of data with corresponding shorter codes-->
+    <string name="data">Data</string>
+
+    <string name="bit">Bit</string>
+    <string name="code_bit">b</string>
+
+    <string name="byte_">Byte</string>
+    <string name="code_byte">B</string>
+
+    <string name="kilobit">Kilobit</string>
+    <string name="code_kilobit">Kb</string>
+
+    <string name="kibibit">Kibibit</string>
+    <string name="code_kibibit">Kib</string>
+
+    <string name="kilobyte">Kilobyte</string>
+    <string name="code_kilobyte">KB</string>
+
+    <string name="kibibyte">Kibibyte</string>
+    <string name="code_kibibyte">KiB</string>
+
+    <string name="megabit">Megabit</string>
+    <string name="code_megabit">Mb</string>
+
+    <string name="mebibit">Mebibit</string>
+    <string name="code_mebibit">Mib</string>
+
+    <string name="megabyte">Megabyte</string>
+    <string name="code_megabyte">MB</string>
+
+    <string name="mebibytes">Mebibyte</string>
+    <string name="code_mebibyte">MiB</string>
+
+    <string name="gigabit">Gigabit</string>
+    <string name="code_gigabit">Gb</string>
+
+    <string name="gibibit">Gibibit</string>
+    <string name="code_gibibit">Gib</string>
+
+    <string name="gigabyte">Gigabyte</string>
+    <string name="code_gigabyte">GB</string>
+
+    <string name="gibibyte">Gibibyte</string>
+    <string name="code_gibibyte">GiB</string>
+
+
+    <string name="terabit">Terabit</string>
+    <string name="code_terabit">Tb</string>
+
+    <string name="tebibits">Tebibit</string>
+    <string name="code_tebibit">Tib</string>
+
+    <string name="terabyte">Terabyte</string>
+    <string name="code_terabyte">TB</string>
+
+    <string name="tebibyte">Tebibyte</string>
+    <string name="code_tebibyte">TiB</string>
+
+
+    <string name="code_petabit">Pb</string>
+    <string name="petabit">Petabit</string>
+
+    <string name="pebibit">Pebibit</string>
+    <string name="code_pebibit">Pib</string>
+
+    <string name="petabytes">Petabyte</string>
+    <string name="code_petabyte">PB</string>
+
+    <string name="pebibyte">Pebibyte</string>
+    <string name="code_pebibyte">PiB</string>
+
+
+    <string name="exabit">Exabit</string>
+    <string name="code_exabit">Eb</string>
+
+    <string name="exbibit">Exbibit</string>
+    <string name="code_exbibit">Eib</string>
+
+    <string name="exabyte">Exabyte</string>
+    <string name="code_exabyte">EB</string>
+
+    <string name="exbibyte">Exbibyte</string>
+    <string name="code_exbibyte">EiB</string>
+
+    <string name="zetabit">Zetabit</string>
+    <string name="code_zetabit">Zb</string>
+
+    <string name="zetabyte">Zetabyte</string>
+    <string name="code_zetabyte">ZB</string>
+
+    <string name="zebibit">Zebibit</string>
+    <string name="code_zebibit">Zib</string>
+
+    <string name="zebibytes">Zebibyte</string>
+    <string name="code_zebibyte">ZiB</string>
+
+    <string name="yotabit">Yottabit</string>
+    <string name="code_yotabit">Yb</string>
+
+    <string name="yobibit">Yobibit</string>
+    <string name="code_yobibit">Yib</string>
+
+    <string name="yottabyte">Yottabyte</string>
+    <string name="code_yottabyte">YB</string>
+
+    <string name="yobibyte">Yobibyte</string>
+    <string name="code_yobibyte">YiB</string>
+
+    <string name="system_international">System International</string>
+
+    <string name="imperial_system">Imperial System</string>
+
+    <string name="united_system_customary_system">United States Customary System (USCS) </string>
+
+    <string name="imperial_system_us">Imperial System (US)</string>
+
+    <string name="unknown">unknown</string>
+
+    <!-- Decimal representation of zero (e.g. "0", "10", "1.0", "1e0"). [CHAR_LIMIT=1] -->
+    <string name="digit_0" translatable="false">0</string>
+    <!-- Decimal representation of one (e.g. "1", "11", "1.1", "1e1"). [CHAR_LIMIT=1] -->
+    <string name="digit_1" translatable="false">1</string>
+    <!-- Decimal representation of two (e.g. "2", "22", "2.2", "2e2"). [CHAR_LIMIT=1] -->
+    <string name="digit_2" translatable="false">2</string>
+    <!-- Decimal representation of three (e.g. "3", "33", "3.3", "3e3"). [CHAR_LIMIT=1] -->
+    <string name="digit_3" translatable="false">3</string>
+    <!-- Decimal representation of four (e.g. "4", "44", "4.4", "4e4"). [CHAR_LIMIT=1] -->
+    <string name="digit_4" translatable="false">4</string>
+    <!-- Decimal representation of five (e.g. "5", "55", "5.5", "5e5"). [CHAR_LIMIT=1] -->
+    <string name="digit_5" translatable="false">5</string>
+    <!-- Decimal representation of six (e.g. "6", "66", "6.6", "6e6"). [CHAR_LIMIT=1] -->
+    <string name="digit_6" translatable="false">6</string>
+    <!-- Decimal representation of seven (e.g. "7", "77", "7.7", "7e7"). [CHAR_LIMIT=1] -->
+    <string name="digit_7" translatable="false">7</string>
+    <!-- Decimal representation of eight (e.g. "8", "88", "8.8", "8e8"). [CHAR_LIMIT=1] -->
+    <string name="digit_8" translatable="false">8</string>
+    <!-- Decimal representation of eight (e.g. "9", "99", "9.9", "9e9"). [CHAR_LIMIT=1] -->
+    <string name="digit_9" translatable="false">9</string>
 </resources>

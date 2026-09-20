@@ -1,5 +1,5 @@
 [versions]
-agp = "9.4.0"
+agp = "9.4.1"
 kotlin = "2.4.20"
 room = "2.8.5"
 nav3 = "1.1.7"
@@ -18,7 +18,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 # ─── Code Generation & Services ───
-ksp = { id = "com.google.devtools.ksp", version = "2.3.4" }
+ksp = { id = "com.google.devtools.ksp", version = "2.3.6" }
 google-services = { id = "com.google.gms.google-services", version = "4.5.0" }
 crashanlytics = { id = "com.google.firebase.crashlytics", version = "3.0.8" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

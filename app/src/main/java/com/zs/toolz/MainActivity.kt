@@ -29,7 +29,7 @@ import com.zs.toolz.common.Navigator
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.SystemFacade
 import com.zs.toolz.common.versionCodeCompat
-import com.zs.toolz.converter.UnitConverter
+import com.zs.toolz.converter.RouteUnitConverter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen as configSplashScreen
@@ -210,7 +210,7 @@ class MainActivity : ComponentActivity(), SystemFacade {
         // Create navigator controller.
         // Decide initial route based on intent, permissions, and authentication requirements.
         if (navController == null || isFreshLaunch)
-            navController = Navigator(UnitConverter)
+            navController = Navigator(RouteUnitConverter)
 
         // Set the main UI content with navigator and controller
         setContent { Toolz(navController!!, controller) }
