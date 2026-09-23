@@ -3,7 +3,7 @@ agp = "9.4.1"
 kotlin = "2.4.20"
 room = "2.8.5"
 nav3 = "1.1.7"
-coil = "3.6.2"
+coil = "3.6.3"
 toolkit = "3.11.0-dev"
 glance = "1.2.0"
 media3 = "1.11.0"
@@ -78,9 +78,9 @@ room-paging = {module = "androidx.room:room-paging", version.ref = "room"}
 # Coil 3 and extensions
 coil-core = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
-coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
-coil-video = { module = "io.coil-kt.coil3:coil-video", version = "3.6.2" }
+coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil" }
 avif-coder-coil = { module = "com.github.awxkee:avif-coder-coil", version = "2.1.4" }
 
 # ─── Toolkit ───
@@ -110,7 +110,7 @@ kotlinx-serialization-protobuf = { group = "org.jetbrains.kotlinx", name = "kotl
 
 
 [bundles]
-coil = ["coil-compose", "coil-svg", "coil-video"]
+coil = ["coil-compose", "coil-svg", "coil-video", "coil-network-ktor"]
 nav3 = ["nav3-runtime", "nav3-ui", "nav3_viewmodel"]
 analytics = ["firebase-analytics-ktx", "firebase-crashlytics-ktx"]
 ads = ["unity_ads_adquality", "unity_ads_mediation"]

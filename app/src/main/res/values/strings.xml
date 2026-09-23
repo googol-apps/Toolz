@@ -488,4 +488,7 @@
     <string name="digit_8" translatable="false">8</string>
     <!-- Decimal representation of eight (e.g. "9", "99", "9.9", "9e9"). [CHAR_LIMIT=1] -->
     <string name="digit_9" translatable="false">9</string>
+    <!--Title to the audio library screen-->
+    <string name="scr_unit_converter_title">Unit <b>Converter</b><font size="10"> <sup><sup>\nEffortless conversions, anytime.</sup></sup> </font></string>
+    <string name="settings">Settings</string>
 </resources>

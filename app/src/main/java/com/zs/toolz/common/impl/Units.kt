@@ -3,7 +3,7 @@ package com.zs.toolz.common.impl
 import com.zs.domain.math.BoundedRational
 import com.zs.domain.math.UnifiedReal
 import com.zs.toolz.common.Res
-import com.zs.toolz.converter.RouteUnitConverter
+import com.zs.toolz.converter.UnitConverter
 import com.zs.toolz.converter.SimpleMeasureUnit
 
 private const val TAG = "Angle"
@@ -36,8 +36,9 @@ private val AngelConverts
  * @return array of units for [converter]
  */
 fun Units(converter: String): List<SimpleMeasureUnit> {
+    return AngelConverts
     return when (converter) {
-        RouteUnitConverter.KEY_ANGLE_CONVERTER -> AngelConverts
+        UnitConverter.KEY_ANGLE_CONVERTER -> AngelConverts
         else -> TODO("Unknown converter $converter")
     }
 }

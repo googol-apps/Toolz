@@ -25,11 +25,10 @@ import com.zs.domain.analytics.Analytics
 import com.zs.domain.util.showPlatformToast
 import com.zs.preferences.Preferences
 import com.zs.toolz.common.NavController
-import com.zs.toolz.common.Navigator
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.SystemFacade
 import com.zs.toolz.common.versionCodeCompat
-import com.zs.toolz.converter.RouteUnitConverter
+import com.zs.toolz.converter.UnitConverter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen as configSplashScreen
@@ -48,16 +47,6 @@ class MainActivity : ComponentActivity(), SystemFacade {
     var inAppUpdateProgress by mutableFloatStateOf(Float.NaN)
         private set
 
-    /**
-     * Timestamp (mills) indicating when the app last went to the background.
-     *
-     * Possible values:
-     * - `-1L`: The app has just started and hasn't been in the background yet.
-     * - `0L`: The app was launched for the first time (initial launch).
-     * - `> 0L`: The time in milliseconds when the app last entered the background.
-     */
-    private var timeAppWentToBackground = -1L
-
     override fun showToast(message: String, duration: Int) = showPlatformToast(message, duration)
     override fun showToast(message: Int, duration: Int) = showPlatformToast(message, duration)
     override fun <T> getDeviceService(name: String): T = getSystemService(name) as T
@@ -67,7 +56,7 @@ class MainActivity : ComponentActivity(), SystemFacade {
         message: CharSequence,
         icon: ImageVector?,
         accent: Color,
-        duration: SnackbarDuration
+        duration: SnackbarDuration,
     ) {
         lifecycleScope.launch {
             controller.showSnackbar(
@@ -176,7 +165,6 @@ class MainActivity : ComponentActivity(), SystemFacade {
             // Show splash screen only on a fresh launch
             configSplashScreen()
 
-
             // TODO - ⚠️ NOTE: We currently rely on versionCode from PackageManager.
             // Monitor this carefully, as Play Console may raise issues related
             // to permission handling when querying app packages.
@@ -209,10 +197,15 @@ class MainActivity : ComponentActivity(), SystemFacade {
 
         // Create navigator controller.
         // Decide initial route based on intent, permissions, and authentication requirements.
-        if (navController == null || isFreshLaunch)
-            navController = Navigator(RouteUnitConverter)
-
-        // Set the main UI content with navigator and controller
-        setContent { Toolz(navController!!, controller) }
+        if (navController == null || isFreshLaunch) {
+            // Decide initial route based on launch context, permissions, and authentication:
+            // - Deep link or external intent → IntentViewer
+            // - Missing required permissions → Onboarding
+            // - Authentication required → ScreenLock
+            // - Default case → Files browser
+            navController = NavController(UnitConverter)
+            // Set the main UI content with navigator and controller
+            setContent { Toolz(navController!!, controller) }
+        }
     }
 }

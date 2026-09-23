@@ -8,7 +8,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.zs.domain.math.UnifiedReal
 import com.zs.preferences.stringPreferenceKey
 import com.zs.toolz.converter.MeasureUnit
-import com.zs.toolz.converter.RouteUnitConverter
+import com.zs.toolz.converter.UnitConverter
 import com.zs.toolz.converter.UnitConverterViewState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -33,7 +33,7 @@ class UnitConverterViewModel : KoinViewModel(), UnitConverterViewState {
     // --- Backing State ---
     // Currently selected converter key (persisted in preferences)
     private val _converter = mutableStateOf(
-        preferences[KEY_CONVERTER] ?: RouteUnitConverter.KEY_ANGLE_CONVERTER
+        preferences[KEY_CONVERTER] ?: UnitConverter.KEY_ANGLE_CONVERTER
     )
 
     // Units available for the active converter
