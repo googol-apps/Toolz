@@ -83,9 +83,8 @@ fun ValueField(
             enabled = !expanded,
             outputTransformation = NumberFormatTransformation,
             label = { Label("Length") },
-            textStyle = AppTheme.typography.headline3.copy(
-                fontWeight = FontWeight.SemiBold
-            ),
+            shape = AppTheme.shapes.medium,
+            textStyle = AppTheme.typography.headline1,
             trailingIcon = {
                 val rotate by animateFloatAsState(targetValue = if (expanded) 0f else 180f)
                 IconButton (

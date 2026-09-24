@@ -116,19 +116,20 @@ object UnitConverter : NavKey {
             primary = {
                 Column(modifier = Modifier
                     .windowInsetsPadding(WindowInsets.content.only(WindowInsetsSides.Top))
-                    .padding(Res.dimen.normal).fillMaxSize(),
+                    .padding(vertical = Res.dimen.normal).fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(Res.dimen.small)
                 ) {
                     Converters(
                         viewState.converter,
                         onRequestCheck = {viewState.converter = it},
-                        modifier = Modifier
+                        modifier = Modifier.padding(horizontal = Res.dimen.normal)
                     )
 
                     ValueField(
                         viewState.value,
                         expanded = false,
                         onRequestCollapse = {},
+                        modifier = Modifier.padding(vertical = Res.dimen.normal, horizontal = Res.dimen.x_large)
                     )
                     val result by viewState.result.collectAsState(Default)
                     val (conversion, more) = result
@@ -136,6 +137,7 @@ object UnitConverter : NavKey {
                         conversion.toStringTruncated(12),
                         expanded = false,
                         onRequestCollapse = {},
+                        modifier = Modifier.padding(vertical = Res.dimen.x_small, horizontal = Res.dimen.x_large)
                     )
                 }
             },
@@ -143,7 +145,7 @@ object UnitConverter : NavKey {
                 NumPad(
                     onKeyPress = viewState.onKeyPress,
                     modifier = Modifier
-                        .windowInsetsPadding(window.union(WindowInsets.navigationBars)).padding(horizontal = Res.dimen.normal)
+                        .windowInsetsPadding(window.union(WindowInsets.navigationBars)).padding(horizontal = Res.dimen.x_large)
                         .clip(AppTheme.shapes.large)
                 )
             },

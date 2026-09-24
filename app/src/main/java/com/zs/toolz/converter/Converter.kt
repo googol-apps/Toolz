@@ -35,7 +35,7 @@ private fun Converter(
     val progress by animateFloatAsState(if (checked) 1f else 0f, animationSpec = motion.slowSpatialSpec())
     Surface(
         onClick = onCheckedToogle,
-        modifier = modifier.size(95.dp, 73.dp),
+        modifier = modifier.size(90.dp, 64.dp),
         color = androidx.compose.ui.graphics.lerp(
             Color.Transparent,
             AppTheme.colors.accent,
