@@ -491,4 +491,6 @@
     <!--Title to the audio library screen-->
     <string name="scr_unit_converter_title">Unit <b>Converter</b><font size="10"> <sup><sup>\nEffortless conversions, anytime.</sup></sup> </font></string>
     <string name="settings">Settings</string>
+    <string name="from">from</string>
+    <string name="equals_to">equals to</string>
 </resources>

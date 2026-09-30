@@ -116,36 +116,40 @@ object UnitConverter : NavKey {
             primary = {
                 Column(modifier = Modifier
                     .windowInsetsPadding(WindowInsets.content.only(WindowInsetsSides.Top))
-                    .padding(vertical = Res.dimen.normal).fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(Res.dimen.small)
+                    .padding(vertical = Res.space.normal)
+                    .fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(Res.space.small)
                 ) {
                     Converters(
                         viewState.converter,
                         onRequestCheck = {viewState.converter = it},
-                        modifier = Modifier.padding(horizontal = Res.dimen.normal)
+                        modifier = Modifier.padding(horizontal = Res.space.normal)
                     )
 
                     ValueField(
                         viewState.value,
                         expanded = false,
                         onRequestCollapse = {},
-                        modifier = Modifier.padding(vertical = Res.dimen.normal, horizontal = Res.dimen.x_large)
+                        label = "Length",
+                        modifier = Modifier.padding(vertical = Res.space.normal, horizontal = Res.space.x_large)
                     )
                     val result by viewState.result.collectAsState(Default)
                     val (conversion, more) = result
                     ResultField(
                         conversion.toStringTruncated(12),
                         expanded = false,
+                        label = "Length",
                         onRequestCollapse = {},
-                        modifier = Modifier.padding(vertical = Res.dimen.x_small, horizontal = Res.dimen.x_large)
+                        modifier = Modifier.padding(vertical = Res.space.x_small, horizontal = Res.space.x_large)
                     )
                 }
             },
             secondary = {
                 NumPad(
-                    onKeyPress = viewState.onKeyPress,
+                    onKeyPress = viewState::onkeyPress,
                     modifier = Modifier
-                        .windowInsetsPadding(window.union(WindowInsets.navigationBars)).padding(horizontal = Res.dimen.x_large)
+                        .windowInsetsPadding(window.union(WindowInsets.navigationBars))
+                        .padding(horizontal = Res.space.x_large)
                         .clip(AppTheme.shapes.large)
                 )
             },

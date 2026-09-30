@@ -16,11 +16,13 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.zs.compose.foundation.textResource
 import com.zs.compose.theme.AppTheme
+import com.zs.compose.theme.ContentAlpha
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.MotionScheme
 import com.zs.compose.theme.adaptive.NavigationSuiteScaffold
 import com.zs.compose.theme.appbar.BottomNavigationItem
+import com.zs.compose.theme.appbar.NavigationItemDefaults
 import com.zs.compose.theme.calculateWindowSizeClass
 import com.zs.compose.theme.dynamicAccentColor
 import com.zs.compose.theme.renderInSharedTransitionScopeOverlay
@@ -31,6 +33,7 @@ import com.zs.toolz.common.NavController
 import com.zs.toolz.common.NightMode
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.compose.NavigationBar
+import com.zs.toolz.common.geom
 import com.zs.toolz.common.impl.UnitConverterViewModel
 import com.zs.toolz.common.preference
 import com.zs.toolz.common.vectorResource
@@ -92,14 +95,21 @@ fun Toolz(
     val navBar: @Composable () -> Unit = {
         NavigationBar(
             vertical = clazz.width > clazz.height,
-            elevation = 8.dp,
             modifier = Modifier.renderInSharedTransitionScopeOverlay(0.3f),
             content = {
+                val colors = NavigationItemDefaults.colors(
+                    selectedIndicatorColor = AppTheme.colors.onAccent.copy(ContentAlpha.indication),
+                    selectedTextColor = AppTheme.colors.onAccent,
+                    selectedIconColor = AppTheme.colors.onAccent,
+                    unselectedTextColor = AppTheme.colors.onAccent,
+                    unselectedIconColor = AppTheme.colors.onAccent,
+                )
                 // Unit Converter
                 BottomNavigationItem(
                     selected = entry is UnitConverter,
                     onClick = { navController.navigate(UnitConverter) },
                     label = { Label(textResource(Res.string.units)) },
+                    colors = colors,
                     icon = {
                         Icon(
                             vectorResource(Res.drawable.ic_straighten_outline),
@@ -113,6 +123,7 @@ fun Toolz(
                     selected = false,
                     onClick = { navController.navigate(Settings) },
                     label = { Label(textResource(Res.string.level)) },
+                    colors = colors,
                     icon = {
                         Icon(
                             vectorResource(Res.drawable.ic_tools_level_outline),
@@ -126,6 +137,7 @@ fun Toolz(
                     selected = entry is Settings,
                     onClick = { navController.navigate(Settings) },
                     label = { Label(textResource(Res.string.settings)) },
+                    colors = colors,
                     icon = {
                         Icon(
                             vectorResource(Res.drawable.ic_settings_outline),
@@ -162,7 +174,7 @@ fun Toolz(
     // Apply Theme + Composition Locals
     AppTheme(
         isLight = !isDarkTheme,
-        fontFamily = androidx.compose.ui.text.font.FontFamily.Default,
+        fontFamily = Res.font.geom,
         motionScheme = MotionScheme.expressive(),
         accent = accent,
         content = {

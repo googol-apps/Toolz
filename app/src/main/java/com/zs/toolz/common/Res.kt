@@ -11,10 +11,15 @@ import android.util.Base64
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -65,6 +70,64 @@ private val ColorSaver = object : IntSaver<Color> {
 }
 
 /**
+ * The standard [GoogleFont.Provider] utilized to asynchronously download
+ * and cache fonts securely via Google Play Services.
+ */
+private val provider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = Res.array.com_google_android_gms_fonts_certs
+)
+
+/**
+ * Creates a [FontFamily] from the given Google Font name.
+ *
+ * @param name The name of theGoogle Font to use.
+ * @return A [FontFamily] object
+ */
+@Stable
+private fun FontFamily(name: String): FontFamily {
+    // Create a GoogleFont object from the given name.
+    val font = GoogleFont(name)
+    // Create a FontFamily object with four different font weights.
+    return FontFamily(
+        Font(fontProvider = provider, googleFont = font, weight = FontWeight.Light),
+        Font(fontProvider = provider, googleFont = font, weight = FontWeight.Medium),
+        Font(fontProvider = provider, googleFont = font, weight = FontWeight.Normal),
+        Font(fontProvider = provider, googleFont = font, weight = FontWeight.Bold),
+    )
+}
+
+// Pre-configured global FontFamily instances.
+private val OutfitFontFamily = FontFamily("Outfit")
+private val RobotoFontFamily = FontFamily("Roboto")
+private val DancingScriptFontFamily = FontFamily("Dancing Script")
+private val GeomFontFamily = FontFamily("Geom")
+private val Orbitron = FontFamily("Orbitron")
+
+// Extension properties providing seamless access to the app's standard typefaces.
+val FontFamily.Companion.outfit get() = OutfitFontFamily
+val FontFamily.Companion.geom get() = GeomFontFamily
+val FontFamily.Companion.dancing_script get() = DancingScriptFontFamily
+val FontFamily.Companion.roboto get() = RobotoFontFamily
+val FontFamily.Companion.default inline get() = Default
+val FontFamily.Companion.orbitron get() = Orbitron
+
+
+// Pre-configured global spacing arrangements using common spacing dimensions.
+private val LargeArrangement = Arrangement.spacedBy(Res.space.large)
+private val SmallArrangement = Arrangement.spacedBy(Res.space.small)
+private val xSmallArrangement = Arrangement.spacedBy(Res.space.x_small)
+private val mediumArrangement = Arrangement.spacedBy(Res.space.medium)
+
+// Extension properties for quickly applying spacing arrangements in Compose layouts.
+val Arrangement.gap_large get() =  LargeArrangement
+val Arrangement.gap_small get() =  SmallArrangement
+val Arrangement.gap_x_small get() =  xSmallArrangement
+val Arrangement.gap_medium get() =  mediumArrangement
+
+
+/**
  * Immutable configuration model for application-wide behavior flags and UI preferences.
  *
  * This configuration is serialized using [kotlinx.serialization] to support persistence
@@ -101,13 +164,16 @@ data class AppConfig(
  * @see app
  * @see shape
  * @see action
- * @see dimen
+ * @see space
  */
 object Res {
 
     // Typealiases for direct access to Android resources (R.string, R.drawable, etc.)
     typealias string = com.zs.toolz.R.string
     typealias drawable = com.zs.toolz.R.drawable
+    typealias array = com.zs.toolz.R.array
+    typealias font = FontFamily.Companion
+    typealias layout = Arrangement
     // typealias raw = com.zs.toolz.R.raw
     // typealias plurals = com.zs.toolz.R.plurals
 
@@ -221,11 +287,16 @@ object Res {
     }
 
     /**
-     * Standardized dimen values for Compose layouts.
+     * Standardized dimension scale for consistent UI spacing, margins, and padding.
      *
-     * Provides consistent [Dp] values and [Arrangement] gaps for UI components.
+     * @property x_small Smallest default padding constraint (4.dp).
+     * @property small Minor padding block (8.dp).
+     * @property medium Standard mid-level spacing boundary (12.dp).
+     * @property normal Default large container padding (16.dp).
+     * @property large Prominent separation between major layout groupings (22.dp).
+     * @property x_large Extreme spacing for hero-level offsets (32.dp).
      */
-    object dimen {
+    object space {
         val x_small: Dp = 4.dp
         val small: Dp = 8.dp
         val medium: Dp = 12.dp
@@ -238,6 +309,12 @@ object Res {
      * Common access to Compose shapes.
      */
     object shape {
+        // Used to style individual items within a column section.
+        val section = RoundedCornerShape(20.dp)
+        val section_top = RoundedCornerShape(20.dp, 20.dp, 0.dp, 0.dp)
+        val section_middle = RectangleShape
+        val section_bottom = RoundedCornerShape(0.dp, 0.dp, 20.dp, 20.dp)
+
         val circle = CircleShape
         val rectangle = RectangleShape
     }

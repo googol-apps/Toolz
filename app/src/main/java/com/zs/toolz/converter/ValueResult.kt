@@ -3,12 +3,11 @@ package com.zs.toolz.converter
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
@@ -17,7 +16,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.rotateTransform
 import com.zs.compose.theme.AppTheme
@@ -25,11 +26,14 @@ import com.zs.compose.theme.IconButton
 import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.OutlinedTextField
 import com.zs.compose.theme.text.TextField
+import com.zs.compose.theme.text.TextFieldDefaults
 import com.zs.toolz.common.Res
+import com.zs.toolz.common.gap_small
+import com.zs.toolz.common.orbitron
 import com.zs.toolz.common.vectorResource
 
 
-val NumberFormatTransformation = OutputTransformation {
+private val NumberFormatTransformation = OutputTransformation {
     val text = asCharSequence()
 
     // Start offset: skip a leading sign, if present.
@@ -55,11 +59,11 @@ val NumberFormatTransformation = OutputTransformation {
 }
 val FIELD_MIN_HEIGHT = 94.dp
 
-
 @Composable
 context(_: UnitConverter)
 fun ValueField(
     state: TextFieldState,
+    label: String,
     expanded: Boolean,
     onRequestCollapse: () -> Unit,
     modifier: Modifier = Modifier
@@ -68,74 +72,81 @@ fun ValueField(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Res.dimen.small)
+        horizontalArrangement = Res.layout.gap_small
     ) {
-        //Header
+        // Header
         Label(
-            text = "FROM",
+            text = stringResource(Res.string.from).uppercase(),
             style = AppTheme.typography.label3,
             modifier = Modifier.rotateTransform(false),
         )
+
+        // value Field
         OutlinedTextField(
             state = state,
             readOnly = true,
             lineLimits = TextFieldLineLimits.SingleLine,
             enabled = !expanded,
             outputTransformation = NumberFormatTransformation,
-            label = { Label("Length") },
+            label = { Label(label) },
             shape = AppTheme.shapes.medium,
-            textStyle = AppTheme.typography.headline1,
+            textStyle = AppTheme.typography.headline1.copy(
+                fontFamily = Res.font.orbitron
+            ),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                unfocusedBorderColor = AppTheme.colors.accent
+            ),
             trailingIcon = {
                 val rotate by animateFloatAsState(targetValue = if (expanded) 0f else 180f)
-                IconButton (
+                IconButton(
                     onClick = { onRequestCollapse() },
                     icon = vectorResource(Res.drawable.ic_expand_more),
                     contentDescription = null,
                     modifier = Modifier.rotate(rotate)
                 )
             },
-            modifier = Modifier.fillMaxWidth().heightIn(min = FIELD_MIN_HEIGHT),
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = FIELD_MIN_HEIGHT, minWidth = Dp.Infinity),
         )
     }
-
 }
 
 @Composable
 context(_: UnitConverter)
 fun ResultField(
     value: String,
+    label: String,
     expanded: Boolean,
     onRequestCollapse: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    //
+//
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Res.dimen.small)
+        horizontalArrangement = Arrangement.spacedBy(Res.space.small)
     ) {
         //Header
         Label(
-            text = "EQUALS TO",
+            text = stringResource(Res.string.equals_to),
             style = AppTheme.typography.label3,
             modifier = Modifier.rotateTransform(false),
         )
         val state = rememberTextFieldState(value)
-        SideEffect(value) {
-            state.edit {
-                this.delete(0, state.text.length)
-                this.insert(0, value)
-            }
-        }
         TextField(
-            state =state,
+            state = state,
             readOnly = true,
             lineLimits = TextFieldLineLimits.SingleLine,
             enabled = !expanded,
             outputTransformation = NumberFormatTransformation,
-            label = { Label("Length") },
+            label = { Label(label) },
             textStyle = AppTheme.typography.headline3.copy(
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
+                fontFamily = Res.font.orbitron
+            ),
+            colors = TextFieldDefaults.textFieldColors(
+                unfocusedIndicatorColor = AppTheme.colors.accent
             ),
             trailingIcon = {
                 val rotate by animateFloatAsState(targetValue = if (expanded) 0f else 180f)
@@ -146,8 +157,13 @@ fun ResultField(
                     modifier = Modifier.rotate(rotate)
                 )
             },
-            modifier = Modifier.fillMaxWidth().heightIn(min = FIELD_MIN_HEIGHT),
+            modifier = Modifier.defaultMinSize(Dp.Infinity, FIELD_MIN_HEIGHT),
         )
-    }
 
+        SideEffect(value) {
+            state.edit {
+                replace(0, value.length, value)
+            }
+        }
+    }
 }
