@@ -1,5 +1,6 @@
 package com.zs.toolz.common.compose
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,9 +9,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -20,6 +24,29 @@ import com.zs.compose.theme.appbar.AppBarDefaults
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.shape.EndConcaveShape
 import com.zs.toolz.common.shape.TopConcaveShape
+
+private val SideBarBorder = BorderStroke(
+    1.dp,
+    Brush.horizontalGradient(
+        listOf(
+            Color.Transparent,
+            Color.Transparent,
+            Color.Gray.copy(0.24f),
+            Color.Transparent,
+        )
+    )
+)
+private val BottomBarBorder =  BorderStroke(
+    1.dp,
+    Brush.verticalGradient(
+        listOf(
+            Color.Gray,
+            Color.Transparent,
+            Color.Transparent,
+            Color.Transparent,
+        )
+    )
+)
 
 @Composable
 fun NavigationBar(
@@ -37,7 +64,8 @@ fun NavigationBar(
                         AppTheme.colors.accent,
                         elevation = 4.dp,
                         shape = EndConcaveShape(16.dp),
-                        noiseAlpha = 0.4f
+                        noiseAlpha = 0.4f,
+                        border = SideBarBorder
                     )
                     .windowInsetsPadding(insets)
                     .padding(vertical = Res.space.normal, horizontal = Res.space.x_small)
@@ -53,11 +81,13 @@ fun NavigationBar(
                         AppTheme.colors.accent,
                         elevation = 4.dp,
                         shape = TopConcaveShape(16.dp),
-                        noiseAlpha = 0.4f
+                        noiseAlpha = 0.4f,
+                        border = BottomBarBorder
                     )
                     .windowInsetsPadding(insets)
-                    .padding(horizontal = Res.space.normal, vertical = Res.space.x_small)
-                    .defaultMinSize(Dp.Infinity, 74.dp),
+                    .padding(top = Res.space.normal)
+                    .wrapContentHeight()
+                    .defaultMinSize(Dp.Infinity, 0.dp),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Bottom
             )
