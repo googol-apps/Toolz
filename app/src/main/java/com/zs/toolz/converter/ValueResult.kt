@@ -1,37 +1,79 @@
 package com.zs.toolz.converter
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.layout.Arrangement
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
-import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.rotateTransform
+import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
-import com.zs.compose.theme.IconButton
+import com.zs.compose.theme.ContentAlpha
+import com.zs.compose.theme.LocalContentColor
+import com.zs.compose.theme.LocalWindowSize
+import com.zs.compose.theme.drawHorizontalDivider
+import com.zs.compose.theme.menu.DropdownMenuItem
+import com.zs.compose.theme.menu.ExposedDropdownMenuAnchorType
+import com.zs.compose.theme.menu.ExposedDropdownMenuBox
+import com.zs.compose.theme.menu.ExposedDropdownMenuBoxScope
+import com.zs.compose.theme.text.Header
 import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.OutlinedTextField
+import com.zs.compose.theme.text.Text
 import com.zs.compose.theme.text.TextField
 import com.zs.compose.theme.text.TextFieldDefaults
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.gap_small
 import com.zs.toolz.common.orbitron
-import com.zs.toolz.common.vectorResource
 
+@Composable
+private inline operator fun MeasureUnit.component1() = when (this) {
+    is SimpleMeasureUnit -> stringResource(symbol)
+    is RawMeasureUnit -> symbol
+    else -> TODO("implement the type ${this::class.simpleName}")
+}
+
+@Composable
+private inline operator fun MeasureUnit.component2() = when (this) {
+    is SimpleMeasureUnit -> stringResource(title)
+    is RawMeasureUnit -> title
+    else -> TODO("implement the type ${this::class.simpleName}")
+}
+
+private val MeasureUnit.group: String
+    @Composable inline get() = when (this) {
+        is SimpleMeasureUnit -> stringResource(group)
+        is RawMeasureUnit -> group
+        else -> TODO("implement the type ${this::class.simpleName}")
+    }
 
 private val NumberFormatTransformation = OutputTransformation {
     val text = asCharSequence()
@@ -57,18 +99,100 @@ private val NumberFormatTransformation = OutputTransformation {
         k++
     }
 }
-val FIELD_MIN_HEIGHT = 94.dp
+val FIELD_MIN_HEIGHT = 84.dp
 
 @Composable
-context(_: UnitConverter)
-fun ValueField(
-    state: TextFieldState,
-    label: String,
+private fun Unit(
+    value: MeasureUnit,
+    checked: Boolean,
+    onToggleRequest: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = AppTheme.colors
+    DropdownMenuItem(
+        onClick = onToggleRequest,
+        enabled = !checked,
+        modifier = modifier.thenIf(checked) {
+            drawBehind {
+                drawRoundRect(
+                    colors.onBackground.copy(ContentAlpha.indication),
+                    size = size.copy(size.width - 2 * Res.space.medium.toPx()),
+                    cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx()),
+                    topLeft = Offset(Res.space.medium.toPx(), 0f)
+                )
+            }
+        },
+        content = {
+            val (symbol, title) = value
+            val color = if (checked) colors.accent else LocalContentColor.current
+            Text(
+                text = symbol,
+                style = AppTheme.typography.title3,
+                fontStyle = FontStyle.Italic,
+                fontWeight = FontWeight.Bold,
+                color = color
+            )
+            Text(
+                text = title,
+                modifier = Modifier.padding(start = Res.space.normal),
+                style = AppTheme.typography.body3,
+                color = color,
+            )
+        }
+    )
+}
+
+@Composable
+private inline fun ExpandableUnitsMenu(
     expanded: Boolean,
-    onRequestCollapse: () -> Unit,
+    checked: MeasureUnit,
+    values: List<MeasureUnit>, // the available units
+    noinline onToggleRequest: (unit: MeasureUnit?) -> Unit, // null, just close else check and close
+    crossinline field: @Composable ExposedDropdownMenuBoxScope.() -> Unit,
+) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { /*expanded = it*/ },
+        content = {
+            field()
+            val state = rememberScrollState()
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { onToggleRequest(null) },
+                scrollState = state,
+                modifier = Modifier.exposedDropdownSize(true).heightIn(max = 360.dp),
+                content = {
+                    val accent = AppTheme.colors.accent
+                    for (i in values.indices) {
+                        val prev = values.getOrNull(i - 1)
+                        val unit = values[i]
+                        if (prev?.group != unit.group)
+                            Header(
+                                text = unit.group,
+                                style = AppTheme.typography.title1,
+                                drawDivider = true,
+                                contentPadding = HeaderPadding
+                            )
+                        Unit(
+                            value = unit,
+                            checked = unit == checked,
+                            onToggleRequest = { onToggleRequest(unit) }
+                        )
+                    }
+                }
+            )
+        }
+    )
+}
+
+private val HeaderPadding = PaddingValues(horizontal = Res.space.normal, vertical = Res.space.small)
+
+@Composable
+fun ValueField(
+    viewState: UnitConverterViewState,
     modifier: Modifier = Modifier
 ) {
-    //
+    val selected = viewState.from
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -82,88 +206,98 @@ fun ValueField(
         )
 
         // value Field
-        OutlinedTextField(
-            state = state,
-            readOnly = true,
-            lineLimits = TextFieldLineLimits.SingleLine,
-            enabled = !expanded,
-            outputTransformation = NumberFormatTransformation,
-            label = { Label(label) },
-            shape = AppTheme.shapes.medium,
-            textStyle = AppTheme.typography.headline1.copy(
-                fontFamily = Res.font.orbitron
-            ),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                unfocusedBorderColor = AppTheme.colors.accent
-            ),
-            trailingIcon = {
-                val rotate by animateFloatAsState(targetValue = if (expanded) 0f else 180f)
-                IconButton(
-                    onClick = { onRequestCollapse() },
-                    icon = vectorResource(Res.drawable.ic_expand_more),
-                    contentDescription = null,
-                    modifier = Modifier.rotate(rotate)
+        var isFocused by remember { mutableStateOf(false) }
+        val manager = LocalFocusManager.current
+        BackHandler(isFocused) {
+            manager.clearFocus(true)
+        }
+
+        ExpandableUnitsMenu(
+            expanded = isFocused,
+            checked = selected,
+            onToggleRequest = { if (it != null) viewState.from = it;manager.clearFocus(true) },
+            values = viewState.units,
+            field = {
+                OutlinedTextField(
+                    state = viewState.value,
+                    readOnly = true,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    outputTransformation = NumberFormatTransformation,
+                    label = { Label(stringResource((selected as SimpleMeasureUnit).title)) },
+                    shape = AppTheme.shapes.medium,
+                    textStyle = AppTheme.typography.headline1.copy(
+                        fontFamily = Res.font.orbitron
+                    ),
+                    colors = TextFieldDefaults.outlinedTextFieldColors(
+                        unfocusedBorderColor = AppTheme.colors.accent
+                    ),
+                    modifier = Modifier
+                        .onFocusChanged { isFocused = it.isFocused }
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
+                        .defaultMinSize(minHeight = FIELD_MIN_HEIGHT, minWidth = Dp.Infinity)
+                    ,
                 )
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = FIELD_MIN_HEIGHT, minWidth = Dp.Infinity),
         )
     }
 }
 
 @Composable
-context(_: UnitConverter)
 fun ResultField(
-    value: String,
-    label: String,
-    expanded: Boolean,
-    onRequestCollapse: () -> Unit,
+    result: String,
+    viewState: UnitConverterViewState,
     modifier: Modifier = Modifier
 ) {
-//
+    val selected = viewState.target
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Res.space.small)
+        horizontalArrangement = Res.layout.gap_small
     ) {
-        //Header
+        // Header
         Label(
-            text = stringResource(Res.string.equals_to),
+            text = stringResource(Res.string.equals_to).uppercase(),
             style = AppTheme.typography.label3,
             modifier = Modifier.rotateTransform(false),
         )
-        val state = rememberTextFieldState(value)
-        TextField(
-            state = state,
-            readOnly = true,
-            lineLimits = TextFieldLineLimits.SingleLine,
-            enabled = !expanded,
-            outputTransformation = NumberFormatTransformation,
-            label = { Label(label) },
-            textStyle = AppTheme.typography.headline3.copy(
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = Res.font.orbitron
-            ),
-            colors = TextFieldDefaults.textFieldColors(
-                unfocusedIndicatorColor = AppTheme.colors.accent
-            ),
-            trailingIcon = {
-                val rotate by animateFloatAsState(targetValue = if (expanded) 0f else 180f)
-                IconButton (
-                    onClick = { onRequestCollapse() },
-                    icon = vectorResource(Res.drawable.ic_expand_more),
-                    contentDescription = null,
-                    modifier = Modifier.rotate(rotate)
-                )
-            },
-            modifier = Modifier.defaultMinSize(Dp.Infinity, FIELD_MIN_HEIGHT),
-        )
 
-        SideEffect(value) {
-            state.edit {
-                replace(0, value.length, value)
-            }
+        // value Field
+        var isFocused by remember { mutableStateOf(false) }
+        val manager = LocalFocusManager.current
+        BackHandler(isFocused) {
+            manager.clearFocus(true)
         }
+
+        ExpandableUnitsMenu(
+            expanded = isFocused,
+            checked = selected,
+            onToggleRequest = { if (it != null) viewState.target = it;manager.clearFocus(true) },
+            values = viewState.units,
+            field = {
+                val state = rememberTextFieldState(result)
+                TextField(
+                    state = state,
+                    readOnly = true,
+                    lineLimits = TextFieldLineLimits.SingleLine,
+                    outputTransformation = NumberFormatTransformation,
+                    label = { Label(stringResource((selected as SimpleMeasureUnit).title)) },
+                    shape = AppTheme.shapes.medium,
+                    textStyle = AppTheme.typography.headline1.copy(
+                        fontFamily = Res.font.orbitron
+                    ),
+                    colors = TextFieldDefaults.textFieldColors(),
+                    modifier = Modifier
+                        .onFocusChanged { isFocused = it.isFocused }
+                        .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable)
+                        .defaultMinSize(minHeight = FIELD_MIN_HEIGHT, minWidth = Dp.Infinity)
+                    ,
+                )
+                SideEffect(result) {
+                    state.edit {
+                        replace(0, result.length, result)
+                    }
+                }
+            },
+        )
     }
 }

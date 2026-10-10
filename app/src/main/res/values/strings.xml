@@ -493,4 +493,5 @@
     <string name="settings">Settings</string>
     <string name="from">from</string>
     <string name="equals_to">equals to</string>
+    <string name="about_equals">About Equals</string>
 </resources>

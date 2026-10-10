@@ -1,6 +1,7 @@
 package com.zs.toolz.common.impl
 
 import android.app.Application
+import android.content.ClipboardManager
 import android.content.Context
 import android.util.Log
 import androidx.startup.Initializer
@@ -115,6 +116,9 @@ private val AppModules = module {
     // This manages the state of snackbars shown in Compose UI.
     singleOf(::SnackbarHostState)
 
+    single<ClipboardManager> {
+        androidContext().getSystemService(ClipboardManager::class.java)
+    }
 
     // --- ViewModels ---
     viewModelOf(::UnitConverterViewModel)

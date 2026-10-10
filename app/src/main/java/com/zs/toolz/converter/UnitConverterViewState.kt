@@ -1,7 +1,6 @@
 package com.zs.toolz.converter
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.text.input.TextFieldBuffer
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
@@ -131,6 +130,7 @@ interface UnitConverterViewState {
     var value: TextFieldState
     var from: MeasureUnit
     var target: MeasureUnit
+    val units: List<MeasureUnit>
 
     val result: Flow<Pair<UnifiedReal, AnnotatedString>>
 
@@ -140,85 +140,8 @@ interface UnitConverterViewState {
     /** Copy the formatted result to the system clipboard. */
     fun copy()
 
-    fun Key.toDigit(): Int {
-       return when(this){
-            Key.NumPad0 -> 0
-            Key.NumPad1 -> 1
-            Key.NumPad2 -> 2
-            Key.NumPad3 -> 3
-            Key.NumPad4 -> 4
-            Key.NumPad5 -> 5
-            Key.NumPad6 -> 6
-            Key.NumPad7 -> 7
-            Key.NumPad8 -> 8
-            Key.NumPad9 -> 9
-            else -> error("Invalid key pressed")
-        }
-    }
-
-    fun onkeyPress(key: Key){
-        value.edit {
-            when{
-                key.keyCode in Key.NumPad0.keyCode..Key.NumPad9.keyCode -> {
-                    val current = asCharSequence().toString()
-                    val digit = key.toDigit().toChar()
-
-                    when {
-                        current == "0" && digit == '0' -> return@edit // avoid "00"
-                        current == "0" -> {
-                            replace(0, length, digit.toString())
-                            selection = TextRange(1)
-                        }
-                        else -> {
-                            val insertAt = selection.min
-                            replace(selection.min, selection.max, digit.toString())
-                            selection = TextRange(insertAt + 1)
-                        }
-                    }
-                }
-                key == Key.Backspace -> {
-                    if (selection.min != selection.max) {
-                        // Case 1: user has selected a range → clear it
-                        replace(selection.min, selection.max, "")
-                    } else if (selection.min > 0) {
-                        // Case 2: no selection → delete the character before the cursor
-                        delete(selection.min - 1, selection.min)
-                    }
-
-                    // If buffer is now empty, enforce "0" as fallback
-                    if (length == 0) {
-                        replace(0, 0, "0")
-                        selection = TextRange(1) // place cursor after the inserted 0
-                    } else {
-                        // Otherwise, keep cursor within bounds
-                        selection = TextRange(selection.min.coerceAtMost(length))
-                    }
-                }
-                key == Key.NumPadDot -> {
-                    val current = asCharSequence()
-                    if ('.' in current) return
-
-                    if (current.isEmpty() || current.toString() == "-") {
-                        val prefix = if (current.toString() == "-") "-0." else "0."
-                        replace(0, length, prefix)
-                        selection = TextRange(length)
-                    } else {
-                        val insertAt = selection.min
-                        replace(selection.min, selection.max, ".")
-                        selection = TextRange(insertAt + 1)
-                    }
-                }
-                key == Key.NumPadSubtract -> {
-                    if (asCharSequence().startsWith('-')) {
-                        delete(0, 1)
-                        selection = TextRange((selection.min - 1).coerceAtLeast(0))
-                    } else {
-                        insert(0, "-")
-                        selection = TextRange(selection.min + 1)
-                    }
-                }
-            }
-        }
-    }
+    fun onKeyPress(key: Key)
 }
+
+
 

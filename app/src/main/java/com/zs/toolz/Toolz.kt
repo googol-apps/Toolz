@@ -20,6 +20,8 @@ import com.zs.compose.theme.ContentAlpha
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.MotionScheme
+import com.zs.compose.theme.WindowSize
+import com.zs.compose.theme.WindowSize.Category
 import com.zs.compose.theme.adaptive.NavigationSuiteScaffold
 import com.zs.compose.theme.appbar.BottomNavigationItem
 import com.zs.compose.theme.appbar.NavigationItemDefaults
@@ -91,10 +93,11 @@ fun Toolz(
     }
     // Determine Navigation Bar Visibility
     val isNavBarRequired = entry is UnitConverter
+    val portrait = clazz.width < Category.Medium
     // Navigation Bar Definition
     val navBar: @Composable () -> Unit = {
         NavigationBar(
-            vertical = clazz.width > clazz.height,
+            vertical = !portrait,
             modifier = Modifier.renderInSharedTransitionScopeOverlay(0.3f),
             content = {
                 val colors = NavigationItemDefaults.colors(
@@ -152,11 +155,11 @@ fun Toolz(
     // Main Content Scaffold
     val content: @Composable () -> Unit = {
         NavigationSuiteScaffold(
-            vertical = true,
+            vertical = portrait,
             containerColor = AppTheme.colors.background,
             progress = activity.inAppUpdateProgress,
             snackbarHostState = controller,
-            hideNavigationBar = false,
+            hideNavigationBar = !isNavBarRequired,
             navBar = navBar,
             content = {
                 NavDisplay(

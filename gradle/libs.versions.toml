@@ -2,7 +2,7 @@
 agp = "9.4.1"
 kotlin = "2.4.20"
 room = "2.8.5"
-nav3 = "1.1.7"
+nav3 = "1.2.0"
 coil = "3.6.3"
 toolkit = "3.11.0-dev"
 glance = "1.2.0"
