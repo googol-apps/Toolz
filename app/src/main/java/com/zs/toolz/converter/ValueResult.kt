@@ -1,11 +1,10 @@
 package com.zs.toolz.converter
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +12,7 @@ import androidx.compose.foundation.text.input.OutputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -22,8 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -38,8 +36,6 @@ import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.ContentAlpha
 import com.zs.compose.theme.LocalContentColor
-import com.zs.compose.theme.LocalWindowSize
-import com.zs.compose.theme.drawHorizontalDivider
 import com.zs.compose.theme.menu.DropdownMenuItem
 import com.zs.compose.theme.menu.ExposedDropdownMenuAnchorType
 import com.zs.compose.theme.menu.ExposedDropdownMenuBox
@@ -118,7 +114,7 @@ private fun Unit(
                     colors.onBackground.copy(ContentAlpha.indication),
                     size = size.copy(size.width - 2 * Res.space.medium.toPx()),
                     cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx()),
-                    topLeft = Offset(Res.space.medium.toPx(), 0f)
+                    topLeft = Offset(Res.space.small.toPx(), 0f)
                 )
             }
         },
@@ -160,7 +156,9 @@ private inline fun ExpandableUnitsMenu(
                 expanded = expanded,
                 onDismissRequest = { onToggleRequest(null) },
                 scrollState = state,
-                modifier = Modifier.exposedDropdownSize(true).heightIn(max = 360.dp),
+                modifier = Modifier
+                    .exposedDropdownSize(true)
+                    .heightIn(max = 360.dp),
                 content = {
                     val accent = AppTheme.colors.accent
                     for (i in values.indices) {
@@ -293,9 +291,7 @@ fun ResultField(
                     ,
                 )
                 SideEffect(result) {
-                    state.edit {
-                        replace(0, result.length, result)
-                    }
+                    state.setTextAndPlaceCursorAtEnd(result)
                 }
             },
         )

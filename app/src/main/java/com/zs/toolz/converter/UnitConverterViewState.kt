@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
@@ -127,11 +128,12 @@ class RawMeasureUnit(
  */
 interface UnitConverterViewState {
     var converter: String
-    var value: TextFieldState
     var from: MeasureUnit
     var target: MeasureUnit
+
     val units: List<MeasureUnit>
 
+    val value: TextFieldState
     val result: Flow<Pair<UnifiedReal, AnnotatedString>>
 
     /** Swap the source and target units and recalculate. */

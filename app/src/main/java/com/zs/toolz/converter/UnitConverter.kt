@@ -37,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.zs.compose.foundation.Background
 import com.zs.compose.foundation.textResource
-import com.zs.compose.foundation.thenIf
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
@@ -79,6 +78,8 @@ object UnitConverter : NavKey {
     const val KEY_POWER_CONVERTER = "_power"
     const val KEY_SPEED_CONVERTER = "_speed"
     const val KEY_DATA_CONVERTER = "_data"
+
+    const val MAX_ALLOWED_CHARS = 12 // max input length
 
     @Composable
     @NonRestartableComposable
@@ -186,7 +187,7 @@ object UnitConverter : NavKey {
                         }
                         val (conversion, more) = result
                         ResultField(
-                            NumUtil.doubleToString(conversion.doubleValue(), 12, 2)!!,
+                            NumUtil.doubleToString(conversion.doubleValue(), MAX_ALLOWED_CHARS, 2)!!,
                             viewState,
                             modifier = if (portrait) FieldPadding else CompactFieldPadding,
                         )
@@ -201,7 +202,7 @@ object UnitConverter : NavKey {
                         )
 
                         Label(
-                            more.ifBlank { "calculating.." },
+                            more,
                             style = AppTheme.typography.label3,
                             modifier = FieldPadding.then(Modifier.horizontalScroll(rememberScrollState()))
                         )
