@@ -65,7 +65,7 @@ private val DefaultExtras = UnifiedReal.ZERO to AnnotatedString("")
 private val AboutEqualsPadding = PaddingValues(start = Res.space.large, end = Res.space.large, top = Res.space.medium)
 
 @Serializable
-object UnitConverter : NavKey {
+object RouteUnitConverter : NavKey {
     const val KEY_AREA_CONVERTER = "_area"
     const val KEY_ANGLE_CONVERTER = "_angle"
     const val KEY_LENGTH_CONVERTER = "_length"

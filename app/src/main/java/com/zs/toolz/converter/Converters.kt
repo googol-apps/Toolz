@@ -104,8 +104,8 @@ fun Converters(
             // length
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_LENGTH_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_LENGTH_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_LENGTH_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_LENGTH_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_length, Res.string.length)
                 )
             }
@@ -113,8 +113,8 @@ fun Converters(
             // weight
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_MASS_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_MASS_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_MASS_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_MASS_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_weight_n_mass, Res.string.weight_and_mass)
                 )
             }
@@ -122,16 +122,16 @@ fun Converters(
             // time
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_TIME_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_TIME_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_TIME_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_TIME_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_time, Res.string.time)
                 )
             }
             // temperatire
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_TEMPERATURE_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_TEMPERATURE_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_TEMPERATURE_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_TEMPERATURE_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_temperature, Res.string.temperature)
                 )
             }
@@ -139,8 +139,8 @@ fun Converters(
             // angle
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_ANGLE_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_ANGLE_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_ANGLE_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_ANGLE_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_angle, Res.string.angle)
                 )
             }
@@ -148,8 +148,8 @@ fun Converters(
             // area
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_AREA_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_AREA_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_AREA_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_AREA_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_area, Res.string.area)
                 )
             }
@@ -158,8 +158,8 @@ fun Converters(
             // pressure
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_PRESSURE_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_PRESSURE_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_PRESSURE_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_PRESSURE_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_pressure, Res.string.pressure)
                 )
             }
@@ -167,8 +167,8 @@ fun Converters(
             // energy
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_ENERGY_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_ENERGY_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_ENERGY_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_ENERGY_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_energy, Res.string.energy)
                 )
             }
@@ -176,8 +176,8 @@ fun Converters(
             // power
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_POWER_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_POWER_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_POWER_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_POWER_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_power, Res.string.power)
                 )
             }
@@ -185,8 +185,8 @@ fun Converters(
             // speed
             item {
                 Converter(
-                    checked = checked == UnitConverter.KEY_SPEED_CONVERTER,
-                    onCheckedToggle = { onRequestCheck(UnitConverter.KEY_SPEED_CONVERTER) },
+                    checked = checked == RouteUnitConverter.KEY_SPEED_CONVERTER,
+                    onCheckedToggle = { onRequestCheck(RouteUnitConverter.KEY_SPEED_CONVERTER) },
                     visuals = IconLable(Res.drawable.ic_motorcycle, Res.string.speed)
                 )
             }
@@ -196,16 +196,16 @@ fun Converters(
     LaunchedEffect(Unit) {
         delay(0.5.seconds)
         val index = when(checked){
-            UnitConverter.KEY_LENGTH_CONVERTER -> 0
-            UnitConverter.KEY_MASS_CONVERTER -> 1
-            UnitConverter.KEY_TIME_CONVERTER -> 2
-            UnitConverter.KEY_TEMPERATURE_CONVERTER -> 3
-            UnitConverter.KEY_ANGLE_CONVERTER -> 4
-            UnitConverter.KEY_AREA_CONVERTER -> 5
-            UnitConverter.KEY_PRESSURE_CONVERTER -> 6
-            UnitConverter.KEY_ENERGY_CONVERTER -> 7
-            UnitConverter.KEY_POWER_CONVERTER -> 8
-            UnitConverter.KEY_SPEED_CONVERTER -> 9
+            RouteUnitConverter.KEY_LENGTH_CONVERTER -> 0
+            RouteUnitConverter.KEY_MASS_CONVERTER -> 1
+            RouteUnitConverter.KEY_TIME_CONVERTER -> 2
+            RouteUnitConverter.KEY_TEMPERATURE_CONVERTER -> 3
+            RouteUnitConverter.KEY_ANGLE_CONVERTER -> 4
+            RouteUnitConverter.KEY_AREA_CONVERTER -> 5
+            RouteUnitConverter.KEY_PRESSURE_CONVERTER -> 6
+            RouteUnitConverter.KEY_ENERGY_CONVERTER -> 7
+            RouteUnitConverter.KEY_POWER_CONVERTER -> 8
+            RouteUnitConverter.KEY_SPEED_CONVERTER -> 9
             else -> TODO("add new converter here!")
         }
         state.animateScrollToItem(index)

@@ -26,7 +26,7 @@ import com.zs.preferences.stringPreferenceKey
 import com.zs.toolz.converter.MeasureUnit
 import com.zs.toolz.converter.RawMeasureUnit
 import com.zs.toolz.converter.SimpleMeasureUnit
-import com.zs.toolz.converter.UnitConverter
+import com.zs.toolz.converter.RouteUnitConverter
 import com.zs.toolz.converter.UnitConverterViewState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -90,7 +90,7 @@ class UnitConverterViewModel(val clipboard: ClipboardManager) : KoinViewModel(),
     // ===================== Backing state =====================
     // Active converter key (length, mass, ...). Restored from preferences, defaults to angle.
     private val _converter = mutableStateOf(
-        preferences[KEY_CONVERTER] ?: UnitConverter.KEY_ANGLE_CONVERTER
+        preferences[KEY_CONVERTER] ?: RouteUnitConverter.KEY_ANGLE_CONVERTER
     )
 
     // Units of the active converter, in display order.
@@ -226,7 +226,7 @@ class UnitConverterViewModel(val clipboard: ClipboardManager) : KoinViewModel(),
                 // enough: "0" -> "0." and "-0" -> "-0.".
                 Key.NumPadDot -> {
                     if ('.' in asCharSequence()) return@edit // one dot only
-                    if (length >= UnitConverter.MAX_ALLOWED_CHARS) {
+                    if (length >= RouteUnitConverter.MAX_ALLOWED_CHARS) {
                         showPlatformToast("Input length exceeded")
                         return@edit
                     }
@@ -241,7 +241,7 @@ class UnitConverterViewModel(val clipboard: ClipboardManager) : KoinViewModel(),
                     if (asCharSequence().startsWith('-')) {
                         delete(0, 1) // removing a character can never exceed the max
                     } else {
-                        if (length >= UnitConverter.MAX_ALLOWED_CHARS) {
+                        if (length >= RouteUnitConverter.MAX_ALLOWED_CHARS) {
                             showPlatformToast("Input length exceeded")
                             return@edit
                         }
@@ -259,7 +259,7 @@ class UnitConverterViewModel(val clipboard: ClipboardManager) : KoinViewModel(),
                         "0" -> replace(0, length, digit)  // "0" -> "5"; "0" then 0 stays "0"
                         "-0" -> replace(1, length, digit) // "-0" -> "-5"
                         else -> {
-                            if (length >= UnitConverter.MAX_ALLOWED_CHARS) {
+                            if (length >= RouteUnitConverter.MAX_ALLOWED_CHARS) {
                                 showPlatformToast("Input length exceeded")
                                 return@edit
                             }
@@ -302,7 +302,7 @@ class UnitConverterViewModel(val clipboard: ClipboardManager) : KoinViewModel(),
             // Display/copy text of the main result, used by copy().
             // Rounded to at most 2 decimals and MAX_ALLOWED_CHARS characters.
             latestResultText =
-                NumUtil.doubleToString(result.doubleValue(), UnitConverter.MAX_ALLOWED_CHARS, 2)!!
+                NumUtil.doubleToString(result.doubleValue(), RouteUnitConverter.MAX_ALLOWED_CHARS, 2)!!
             // --- Step 4: "About equals" suggestions ---
             // Suggest the units whose value is closest to 1 on a log scale
             // (so 0.04 and 25 are equally far from 1). These are the most

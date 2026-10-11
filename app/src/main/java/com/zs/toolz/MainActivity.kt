@@ -28,7 +28,7 @@ import com.zs.toolz.common.NavController
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.SystemFacade
 import com.zs.toolz.common.versionCodeCompat
-import com.zs.toolz.converter.UnitConverter
+import com.zs.toolz.converter.RouteUnitConverter
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen as configSplashScreen
@@ -203,7 +203,7 @@ class MainActivity : ComponentActivity(), SystemFacade {
             // - Missing required permissions → Onboarding
             // - Authentication required → ScreenLock
             // - Default case → Files browser
-            navController = NavController(UnitConverter)
+            navController = NavController(RouteUnitConverter)
             // Set the main UI content with navigator and controller
             setContent { Toolz(navController!!, controller) }
         }

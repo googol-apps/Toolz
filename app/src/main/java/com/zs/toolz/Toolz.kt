@@ -6,7 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -20,7 +22,6 @@ import com.zs.compose.theme.ContentAlpha
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.MotionScheme
-import com.zs.compose.theme.WindowSize
 import com.zs.compose.theme.WindowSize.Category
 import com.zs.compose.theme.adaptive.NavigationSuiteScaffold
 import com.zs.compose.theme.appbar.BottomNavigationItem
@@ -39,7 +40,8 @@ import com.zs.toolz.common.geom
 import com.zs.toolz.common.impl.UnitConverterViewModel
 import com.zs.toolz.common.preference
 import com.zs.toolz.common.vectorResource
-import com.zs.toolz.converter.UnitConverter
+import com.zs.toolz.converter.RouteUnitConverter
+import com.zs.toolz.level.RouteLevel
 import com.zs.toolz.settings.Settings
 import org.koin.androidx.compose.koinViewModel
 import com.zs.compose.theme.snackbar.SnackbarHostState as SnackbarController
@@ -53,10 +55,12 @@ private val NavGraphBuilder = { key: NavKey ->
     when (key) {
         // --- App Intro Screen ---
         // If the route is AppIntro, show the AppIntro composable.
-        UnitConverter -> NavEntry(key) { UnitConverter(koinViewModel<UnitConverterViewModel>()) }
+        RouteUnitConverter -> NavEntry(key) { RouteUnitConverter(koinViewModel<UnitConverterViewModel>()) }
+        RouteLevel -> NavEntry(key) { RouteLevel() }
+
         // --- Fallback ---
         // For any unhandled route, throw a TODO to indicate missing implementation.
-        else -> TODO("${key} - Not Implemented yet!")
+        else -> TODO("$key - Not Implemented yet!")
     }
 }
 
@@ -92,7 +96,7 @@ fun Toolz(
         }
     }
     // Determine Navigation Bar Visibility
-    val isNavBarRequired = entry is UnitConverter
+    val isNavBarRequired by remember { derivedStateOf { entry is RouteUnitConverter || entry is RouteLevel } }
     val portrait = clazz.width < Category.Medium
     // Navigation Bar Definition
     val navBar: @Composable () -> Unit = {
@@ -109,8 +113,8 @@ fun Toolz(
                 )
                 // Unit Converter
                 BottomNavigationItem(
-                    selected = entry is UnitConverter,
-                    onClick = { navController.navigate(UnitConverter) },
+                    selected = entry is RouteUnitConverter,
+                    onClick = { navController.navigate(RouteUnitConverter) },
                     label = { Label(textResource(Res.string.units)) },
                     colors = colors,
                     icon = {
@@ -123,8 +127,8 @@ fun Toolz(
 
                 // Level
                 BottomNavigationItem(
-                    selected = false,
-                    onClick = { navController.navigate(Settings) },
+                    selected = entry is RouteLevel,
+                    onClick = { navController.navigate(RouteLevel) },
                     label = { Label(textResource(Res.string.level)) },
                     colors = colors,
                     icon = {
