@@ -38,7 +38,7 @@ object RouteLevel: NavKey {
     @Composable
     @NonRestartableComposable
     operator fun invoke() {
-        val rawTilt by rememberTilt()
+        val rawTilt by rememberTilt(filterWindowMs = 500)
         val tilt = rawTilt of Tilt
         val preferences: Preferences =  koinInject()
         val rawCalibrated by preference(KEY_CALIBRATION)
@@ -47,7 +47,7 @@ object RouteLevel: NavKey {
 
             val calibrated = tilt.copy(pitch = tilt.pitch - pitch, roll = tilt.roll - roll, spin = tilt.spin - spin)
             Log.d(TAG, "invoke: tilt: $tilt $calibrated")
-            BubbleLevel(tilt.copy(tilt.pitch - pitch, tilt.roll - roll, tilt.spin - spin), modifier = Modifier.fillMaxSize())
+            BubbleLevel({ tilt }, modifier = Modifier.fillMaxSize())
             Button(onClick = { preferences[KEY_CALIBRATION] =  rawTilt}) {
                 Label("Calibrate")
             }
