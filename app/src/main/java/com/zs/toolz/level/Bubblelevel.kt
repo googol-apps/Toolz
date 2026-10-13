@@ -43,6 +43,7 @@ private const val DegToRad = 0.017453292f // Degrees → radians conversion fact
 //
 // Bubble geometry
 private const val BubbleRadiusFraction = 0.15f // Bubble radius as fraction of dish radius
+private const val TargetRadiusFraction = BubbleRadiusFraction * 1.10f // Target radius as fraction of dish radius
 //
 // Ruler layout
 private const val RulerSpacingFraction = 0.2f  // Distance per degree along ruler axis (fraction of dish radius)
@@ -58,6 +59,8 @@ private val DishColors = listOf(Color(0xFFC8E6C9), Color(0xFF66BB6A))  // Liquid
 private val BubbleRed = Color(0xFFE53935)    // Outside halfway ring
 private val BubbleYellow = Color(0xFFFFC107) // Inside halfway ring
 private val BubbleGreen = Color(0xFF00C853)  // Inside target ring
+
+private val CrossHairLineWidth = 2.dp
 
 
 // ---------------------------------------------------------------------------
@@ -84,21 +87,13 @@ private fun DrawScope.drawRuler(
     value: Float,
     vertical: Boolean,
     radius: Float,
-    lineWidth: Float,
     color: Color
 ) {
     // "along" runs down the ruler, "across" points to the side with ticks and numbers.
     val along = if (vertical) Offset(0f, 1f) else Offset(1f, 0f)
     val across = if (vertical) Offset(1f, 0f) else Offset(0f, 1f)
     val spacing = radius * RulerSpacingFraction // pixels per degree
-
-    // Line: the crosshair itself, edge to edge of the liquid.
-    drawLine(
-        color = color,
-        start = center - along * radius,
-        end = center + along * radius,
-        strokeWidth = lineWidth
-    )
+    val lineWidthPx = CrossHairLineWidth.toPx()
 
     // Ticks, counted in tenths of a degree so the whole and half marks are exact.
     val firstTick = floor((value - RulerHalfSpan) * 10f).toInt()
@@ -117,7 +112,7 @@ private fun DrawScope.drawRuler(
             color = color.copy(alpha = color.alpha * strength),
             start = start,
             end = start + across * length,
-            strokeWidth = lineWidth / 2f
+            strokeWidth = lineWidthPx / 2f
         )
     }
 
@@ -269,26 +264,26 @@ private fun DrawScope.drawBubble(
 // ---------------------------------------------------------------------------
 
 /** Bezel: a metal ring, lit from the upper left. */
-private fun DrawScope.drawBezel(dishRadius: Float) {
+private fun DrawScope.drawBezel(radius: Float) {
     drawCircle(
         brush = Brush.linearGradient(
             colors = BezelColors,
-            start = Offset(center.x - dishRadius, center.y - dishRadius),
-            end = Offset(center.x + dishRadius, center.y + dishRadius)
+            start = Offset(center.x - radius, center.y - radius),
+            end = Offset(center.x + radius, center.y + radius)
         ),
-        radius = dishRadius
+        radius = radius
     )
 }
 
 /** Liquid: lighter in the middle and deeper green toward the edge. */
-private fun DrawScope.drawDish(liquidRadius: Float) {
+private fun DrawScope.drawDish(radius: Float) {
     drawCircle(
         brush = Brush.radialGradient(
             colors = DishColors,
             center = center,
-            radius = liquidRadius
+            radius = radius
         ),
-        radius = liquidRadius
+        radius = radius
     )
     // depth of te liquid
     drawCircle(
@@ -298,9 +293,9 @@ private fun DrawScope.drawDish(liquidRadius: Float) {
                 1f to Color.Black.copy(alpha = 0.3f)
             ),
             center = center,
-            radius = liquidRadius
+            radius = radius
         ),
-        radius = liquidRadius
+        radius = radius
     )
 }
 
@@ -310,11 +305,51 @@ private fun DrawScope.drawGlass(liquidRadius: Float, dishRadius: Float) {
     drawArc(
         color = Color.White.copy(alpha = 0.35f),
         startAngle = 205f,
-        sweepAngle = 130f,
+        sweepAngle = 80f,
         useCenter = false,
         topLeft = Offset(center.x - glintRadius, center.y - glintRadius),
         size = Size(glintRadius * 2f, glintRadius * 2f),
-        style = Stroke(width = dishRadius * 0.05f, cap = StrokeCap.Round)
+        style = Stroke(width = dishRadius * 0.1f, cap = StrokeCap.Round)
+    )
+}
+
+/**
+ * The fixed reticle: the halfway ring, the crosshair lines and the BullsEye.
+ * [dishRadius] is the radius of the liquid in pixels.
+ */
+private fun DrawScope.drawReticle(
+    color: Color,
+    dishRadius: Float
+) {
+    val lineWidth = CrossHairLineWidth.toPx()
+
+    // Halfway ring
+    drawCircle(
+        color = color.copy(alpha = color.alpha * 0.35f),
+        radius = dishRadius * 0.5f,
+        style = Stroke(lineWidth)
+    )
+
+    // Crosshair lines, edge to edge of the liquid.
+    drawLine(
+        color = color,
+        start = Offset(center.x - dishRadius, center.y),
+        end = Offset(center.x + dishRadius, center.y),
+        strokeWidth = lineWidth
+    )
+    drawLine(
+        color = color,
+        start = Offset(center.x, center.y - dishRadius),
+        end = Offset(center.x, center.y + dishRadius),
+        strokeWidth = lineWidth
+    )
+
+    // BullsEye?target
+    val targetRadiusPx = dishRadius * TargetRadiusFraction
+    drawCircle(
+        color = color,
+        radius = targetRadiusPx ,
+        style = Stroke(lineWidth)
     )
 }
 
@@ -363,10 +398,9 @@ fun BubbleLevel(
         val dishRadiusPx = radiusPx * (1f - 0.04f)
         val bubbleRadiusPx = dishRadiusPx * BubbleRadiusFraction
         val targetRadiusPx = bubbleRadiusPx * 1.10f
-        val lineWidthPx = 2.dp.toPx()
 
         // Wall: the farthest the bubble's center may be from the middle.
-        val boundaryRadiusPx = dishRadiusPx - bubbleRadiusPx - lineWidthPx
+        val boundaryRadiusPx = dishRadiusPx - bubbleRadiusPx
         val halfwayRingRadiusPx = boundaryRadiusPx * 0.5f
 
         // Pull: how strongly gravity pulls toward the right edge (pullX) and the top
@@ -391,11 +425,9 @@ fun BubbleLevel(
         drawBezel(radiusPx)
         drawDish(dishRadiusPx)
 
-        // halfway circle
-        drawCircle(
-            color = Color.Black.copy(alpha = 0.35f),
-            radius = halfwayRingRadiusPx,
-            style = Stroke(lineWidthPx)
+        drawReticle(
+            Color.Black,
+            dishRadiusPx
         )
 
         // Each ruler draws its own crosshair line, tick marks and numbers.
@@ -404,7 +436,6 @@ fun BubbleLevel(
             value = asin(pullX.coerceIn(-1f, 1f)) / DegToRad,
             vertical = false,
             radius = dishRadiusPx,
-            lineWidth = lineWidthPx,
             color = Color.Black,
             style = style
         )
@@ -413,16 +444,8 @@ fun BubbleLevel(
             value = asin(pullY.coerceIn(-1f, 1f)) / DegToRad,
             vertical = true,
             radius = dishRadiusPx,
-            lineWidth = lineWidthPx,
             color = Color.Black,
             style = style
-        )
-
-        // Target
-        drawCircle(
-            color = Color.Black,
-            radius = targetRadiusPx,
-            style = Stroke(lineWidthPx)
         )
 
         // Tint: red outside the CautionRing, yellow inside it, green inside the BullsEye.
