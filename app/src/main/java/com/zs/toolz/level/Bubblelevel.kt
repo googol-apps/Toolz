@@ -1,6 +1,7 @@
 package com.zs.toolz.level
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -10,14 +11,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.zs.compose.foundation.RedViolet
 import com.zs.compose.theme.AppTheme
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.orbitron
@@ -41,33 +44,53 @@ import androidx.compose.ui.graphics.lerp as lerpColor
 //
 // Math helpers
 private const val DegToRad = 0.017453292f // Degrees → radians conversion factor
+
 //
 // Dish
-private const val DishRadiusFraction = 0.96f // Dish radius as fraction of the bezel radius
 //
 // Bubble geometry (all fractions of dish radius)
 private const val BubbleRadiusFraction = 0.15f
 private const val TargetRadiusFraction = BubbleRadiusFraction * 1.10f
 private const val HalfwayRingFraction = 0.5f
-private const val MaxBubbleFraction = 1f - BubbleRadiusFraction // farthest the bubble centre may be from the middle
+private const val MaxBubbleFraction =
+    1f - BubbleRadiusFraction // farthest the bubble centre may be from the middle
+
 //
 // Ruler layout
-private const val RulerSpacingFraction = 0.2f  // Distance per degree along ruler axis (fraction of dish radius)
+private const val RulerSpacingFraction =
+    0.2f  // Distance per degree along ruler axis (fraction of dish radius)
 private const val RulerHalfSpan = 2.5f         // Degrees shown on each side of the reticle center
-private const val RulerNumberDistanceFraction = 0.3f // Distance of ruler numbers from crosshair (fraction of radius)
-private const val RularFarNumberScaleFraction = 0.7f // Size of the far numbers relative to the main number
-//
-// Bezel & dish appearance
-private val BezelColors = listOf(Color(0xFFB0BEC5), Color(0xFF455A64)) // Metallic bezel gradient: lit → shaded
-private val DishColors = listOf(Color(0xFFC8E6C9), Color(0xFF66BB6A))  // Liquid gradient: light green → deep green
-//
-// Bubble state colors
-private val BubbleRed = Color(0xFFE53935)    // Outside halfway ring
-private val BubbleYellow = Color(0xFFFFC107) // Inside halfway ring
-private val BubbleGreen = Color(0xFF00C853)  // Inside target ring
+private const val RulerNumberDistanceFraction =
+    0.3f // Distance of ruler numbers from crosshair (fraction of radius)
+private const val RularFarNumberScaleFraction =
+    0.7f // Size of the far numbers relative to the main number
 
 private val CrossHairLineWidth = 2.dp
 
+// ---------------------------------------------------------------------------
+// Dish
+// ---------------------------------------------------------------------------
+/** Liquid: lighter in the middle and deeper green toward the edge. */
+private fun DrawScope.drawDish(tint: Color, radius: Float) {
+    // Wall: 1dp solid tint at the very edge, over a faint tinted body that is
+    // mostly clear in the middle
+    val wall = 1.dp
+    val wallPct = (wall.toPx() / radius).coerceAtMost(0.1f)
+    drawCircle(
+        brush = Brush.radialGradient(
+            colorStops = arrayOf(
+                0.00f to Color.Transparent,
+                0.70f to tint.copy(alpha = 0.08f),
+                0.85f to tint.copy(alpha = 0.11f),
+                1.0f - wallPct to tint.copy(alpha = 0.22f),
+                1.0f to tint.copy(0.32f)
+            ),
+            center = center,
+            radius = radius
+        ),
+        radius = radius,
+    )
+}
 
 // ---------------------------------------------------------------------------
 // Ruler: line, tick marks and numbers
@@ -88,7 +111,7 @@ private val CrossHairLineWidth = 2.dp
  *   slides to the middle, and shrinks and thins as it slides away. Farther out it
  *   fades, so there are about three numbers at a time.
  */
-private fun DrawScope.drawRuler(
+fun DrawScope.drawRuler(
     textMeasurer: TextMeasurer,
     style: TextStyle,
     fraction: Float,
@@ -96,6 +119,7 @@ private fun DrawScope.drawRuler(
     dishRadius: Float,
     color: Color
 ) {
+    val dishRadius = size.maxDimension / 2f
     val value = asin(fraction.coerceIn(-1f, 1f)) / DegToRad // degrees
 
     // "along" runs down the ruler, "across" points to the side with ticks and numbers.
@@ -171,17 +195,17 @@ private fun DrawScope.drawRuler(
 // ---------------------------------------------------------------------------
 // Bubble
 // ---------------------------------------------------------------------------
-
 /**
  * The bubble, drawn bottom to top: shadow, body, refraction, wall, shine.
  * [fraction] is the bubble centre as a fraction of [dishRadius] from the dish middle
  * (-1..1 on each axis), and [tint] is the bubble color (red, yellow or green).
  */
-private fun DrawScope.drawBubble(
+fun DrawScope.drawBubble(
     tint: Color,
     fraction: Offset,
     dishRadius: Float
 ) {
+    val dishRadius = size.maxDimension / 2f
     val bubbleRadius = dishRadius * BubbleRadiusFraction
     val bubbleCenter = center + fraction * dishRadius
     val rim = lerpColor(tint, Color.Black, 0.35f)
@@ -265,61 +289,6 @@ private fun DrawScope.drawBubble(
     )
 }
 
-// ---------------------------------------------------------------------------
-// Dish
-// ---------------------------------------------------------------------------
-
-/** Bezel: a metal ring around the dish, lit from the upper left. */
-private fun DrawScope.drawBezel(dishRadius: Float) {
-    val radius = dishRadius / DishRadiusFraction
-    drawCircle(
-        brush = Brush.linearGradient(
-            colors = BezelColors,
-            start = Offset(center.x - radius, center.y - radius),
-            end = Offset(center.x + radius, center.y + radius)
-        ),
-        radius = radius
-    )
-}
-
-/** Liquid: lighter in the middle and deeper green toward the edge. */
-private fun DrawScope.drawDish(dishRadius: Float) {
-    drawCircle(
-        brush = Brush.radialGradient(
-            colors = DishColors,
-            center = center,
-            radius = dishRadius
-        ),
-        radius = dishRadius
-    )
-    // Depth of the liquid
-    drawCircle(
-        brush = Brush.radialGradient(
-            colorStops = arrayOf(
-                0.75f to Color.Transparent,
-                1f to Color.Black.copy(alpha = 0.3f)
-            ),
-            center = center,
-            radius = dishRadius
-        ),
-        radius = dishRadius
-    )
-}
-
-/** Glass glint: a faint curved highlight on the upper left of the dome, drawn last. */
-private fun DrawScope.drawGlass(dishRadius: Float) {
-    val glintRadius = dishRadius * 0.88f
-    drawArc(
-        color = Color.White.copy(alpha = 0.35f),
-        startAngle = 205f,
-        sweepAngle = 80f,
-        useCenter = false,
-        topLeft = Offset(center.x - glintRadius, center.y - glintRadius),
-        size = Size(glintRadius * 2f, glintRadius * 2f),
-        style = Stroke(width = dishRadius * 0.1f, cap = StrokeCap.Round)
-    )
-}
-
 /** The fixed reticle: the halfway ring, the crosshair lines and the BullsEye. */
 private fun DrawScope.drawReticle(
     color: Color,
@@ -356,48 +325,34 @@ private fun DrawScope.drawReticle(
     )
 }
 
-// ---------------------------------------------------------------------------
-// BubbleLevel
-// ---------------------------------------------------------------------------
-
 /**
- * A bull's-eye bubble level for a phone lying flat: a glass dish of green liquid in
- * a metal bezel, with a glossy bubble that moves with the tilt.
+ * A circular bubble level drawn on a [Canvas]: a dish with a reticle, a ruler along
+ * each axis, and a bubble that drifts toward the low side of the device.
  *
- * The bubble is red outside the halfway ring, yellow inside it, and green inside the
- * BullsEye. The crosshair, BullsEye and rulers are always black.
+ * Everything is sized from the dish radius, so the level fills the smaller side of
+ * its bounds. The bubble stays inside the dish wall, while the rulers show the raw
+ * axis values.
  *
- * Along each crosshair line runs a ruler that shows the tilt in degrees. It slides
- * under the middle of the crosshair as you tilt. Horizontal: right is positive.
- * Vertical: down is positive.
- *
- * It is meant for [Position.FLAT]. It draws exactly what it is given: there is no
- * animation here, so the jitter has to be filtered at the sensor (see smoothingTimeMs
- * in rememberTilt). An unspecified tilt is drawn as zero (level).
- *
- * ```
- * val raw = rememberTilt() // keep the State, do not read it here with `by`
- * BubbleLevel(
- *     tilt = { Tilt(raw.longValue) },
- *     modifier = Modifier.fillMaxWidth().padding(24.dp)
- * )
- * ```
- *
- * [tilt] is a lambda so that the state is read while drawing. Each sensor reading then
- * redraws only the canvas and does not recompose the screen around it.
+ * @param tilt supplies the current pitch and roll in degrees. It is a lambda so
+ * sensor updates only redraw instead of recomposing; invalid values fall back to
+ * [Tilt.Zero].
+ * @param modifier modifier applied to the canvas.
+ * @param color accent used for the dish, reticle and rulers.
+ * @param style text style for the ruler numbers.
  */
 @Composable
 fun BubbleLevel(
     tilt: () -> Tilt,
     modifier: Modifier = Modifier,
+    color: Color = Color.RedViolet,
     style: TextStyle = AppTheme.typography.title1.copy(fontFamily = Res.font.orbitron)
 ) {
     val textMeasurer = rememberTextMeasurer(cacheSize = 32)
-    Canvas(modifier = modifier) {
+    Canvas(modifier = modifier.size(250.dp, 250.dp)) {
         val t = tilt().takeOrElse { Tilt.Zero }
 
         // Everything follows from the radius of the dish.
-        val dishRadius = size.minDimension / 2f * DishRadiusFraction
+        val dishRadius = size.minDimension / 2f
 
         // Gravity pull as a fraction of the dish, -1..1 on each axis, (0, 0) at the middle.
         //  - cos(pitch) removes the roll exaggeration when the phone is tipped forward/back.
@@ -413,9 +368,8 @@ fun BubbleLevel(
         val fraction =
             if (distance > MaxBubbleFraction) pull * (MaxBubbleFraction / distance) else pull
 
-        drawBezel(dishRadius)
-        drawDish(dishRadius)
-        drawReticle(Color.Black.copy(0.3f), dishRadius)
+        drawDish(color, dishRadius)
+        drawReticle(color.copy(0.3f), dishRadius)
 
         // Each ruler draws its own ticks and numbers from the raw axis value.
         drawRuler(
@@ -424,7 +378,7 @@ fun BubbleLevel(
             fraction = pull.x,
             vertical = false,
             dishRadius = dishRadius,
-            color = Color.Black
+            color = color
         )
         drawRuler(
             textMeasurer = textMeasurer,
@@ -432,16 +386,144 @@ fun BubbleLevel(
             fraction = pull.y,
             vertical = true,
             dishRadius = dishRadius,
-            color = Color.Black
+            color = color
         )
 
-        // Tint: red outside the halfway ring, yellow inside it, green inside the BullsEye.
-        val tint = when {
-            fraction.getDistance() <= TargetRadiusFraction -> BubbleGreen
-            fraction.getDistance() <= HalfwayRingFraction -> BubbleYellow
-            else -> BubbleRed
+        drawBubble(color, fraction, dishRadius)
+    }
+}
+
+
+private fun DrawScope.drawTube(color: Color, vertical: Boolean) {
+    val thickness = if (vertical) size.width else size.height
+    val length = if (vertical) size.height else size.width
+    val r = thickness / 2f
+    val wallPct = (1.dp.toPx() / r).coerceAtMost(0.1f)
+
+    // Same profile as drawDish (t = 0 center -> 1 edge)
+    val profile = arrayOf(
+        0.00f to Color.Transparent,
+        0.70f to color.copy(alpha = 0.08f),
+        0.85f to color.copy(alpha = 0.11f),
+        1f - wallPct to color.copy(alpha = 0.22f),
+        1.00f to color.copy(alpha = 0.32f),
+    )
+    val cross = (profile.reversed().map { (0.5f - it.first / 2f) to it.second } +
+            profile.drop(1).map { (0.5f + it.first / 2f) to it.second }).toTypedArray()
+
+    // Straight middle: gradient across the tube
+    drawRect(
+        brush = if (vertical) Brush.horizontalGradient(colorStops = cross, endX = thickness)
+        else Brush.verticalGradient(colorStops = cross, endY = thickness),
+        topLeft = if (vertical) Offset(0f, r) else Offset(r, 0f),
+        size = if (vertical) Size(thickness, length - 2 * r) else Size(length - 2 * r, thickness),
+    )
+
+    // Rounded ends: the dish gradient, clipped to the outer half of each circle
+    for (along in listOf(r, length - r)) {
+        val c = if (vertical) Offset(r, along) else Offset(along, r)
+        val outerStart = if (along == r) 0f else along
+        val outerEnd = if (along == r) along else length
+        clipRect(
+            left = if (vertical) 0f else outerStart,
+            top = if (vertical) outerStart else 0f,
+            right = if (vertical) thickness else outerEnd,
+            bottom = if (vertical) outerEnd else thickness,
+        ) {
+            drawCircle(Brush.radialGradient(colorStops = profile, center = c, radius = r), r, c)
         }
-        drawBubble(tint, fraction, dishRadius)
-        drawGlass(dishRadius)
+    }
+}
+
+
+@Composable
+fun HorizontalBubbleLevel(
+    tilt: () -> Tilt,
+    modifier: Modifier = Modifier,
+    color: Color = Color.RedViolet,
+    style: TextStyle = AppTheme.typography.title1.copy(fontFamily = Res.font.orbitron)
+) {
+    val textMeasurer = rememberTextMeasurer(cacheSize = 32)
+    Canvas(modifier = modifier.size( 250.dp,  64.dp)) {
+        val t = tilt().takeOrElse { Tilt.Zero }
+        // Gravity pull as a fraction of the dish, -1..1 on each axis, (0, 0) at the middle.
+        //  - cos(pitch) removes the roll exaggeration when the phone is tipped forward/back.
+        //  - sin(roll) makes face-down read the same as face-up.
+        val pull = Offset(
+            x = cos(t.pitch * DegToRad) * sin(t.roll * DegToRad),
+            y = sin(t.pitch * DegToRad)
+        )
+
+        // The bubble fraction: the pull, held inside the wall (the bubble touches the
+        // dish edge, it never crosses it).
+        val distance = pull.getDistance()
+        val fraction =
+            if (distance > MaxBubbleFraction) pull * (MaxBubbleFraction / distance) else pull
+
+        drawTube(color, false)
+
+        // Each ruler draws its own ticks and numbers from the raw axis value.
+        val topInset = 3.dp.toPx() // 0 to sit flush on the edge
+
+        translate(top = - center.y) {
+            drawRuler(
+                textMeasurer = textMeasurer,
+                style = style,
+                fraction = pull.x,
+                vertical = false,
+                dishRadius = size.width/2f,
+                color = color
+            )
+        }
+
+        drawBubble(color, fraction.copy(y = 0f), size.width /2)
+
+    }
+}
+
+
+@Composable
+fun VerticalBubbleLevel(
+    tilt: () -> Tilt,
+    modifier: Modifier = Modifier,
+    color: Color = Color.RedViolet,
+    style: TextStyle = AppTheme.typography.title1.copy(fontFamily = Res.font.orbitron)
+) {
+    val textMeasurer = rememberTextMeasurer(cacheSize = 32)
+    Canvas(modifier = modifier.size( 64.dp,  250.dp)) {
+        val t = tilt().takeOrElse { Tilt.Zero }
+        // Gravity pull as a fraction of the dish, -1..1 on each axis, (0, 0) at the middle.
+        //  - cos(pitch) removes the roll exaggeration when the phone is tipped forward/back.
+        //  - sin(roll) makes face-down read the same as face-up.
+        val pull = Offset(
+            x = cos(t.pitch * DegToRad) * sin(t.roll * DegToRad),
+            y = sin(t.pitch * DegToRad)
+        )
+
+        // The bubble fraction: the pull, held inside the wall (the bubble touches the
+        // dish edge, it never crosses it).
+        val distance = pull.getDistance()
+        val fraction =
+            if (distance > MaxBubbleFraction) pull * (MaxBubbleFraction / distance) else pull
+
+        drawTube(color, true)
+
+        // Each ruler draws its own ticks and numbers from the raw axis value.
+        val topInset = 3.dp.toPx() // 0 to sit flush on the edge
+
+        translate(left = -center.x) {
+            drawRuler(
+                textMeasurer = textMeasurer,
+                style = style,
+                fraction = pull.y,
+                vertical = true,
+                dishRadius = size.height /2f,
+                color = color
+            )
+        }
+
+
+        drawBubble(color, fraction.copy(x = 0f), size.height /2)
+
     }
 }

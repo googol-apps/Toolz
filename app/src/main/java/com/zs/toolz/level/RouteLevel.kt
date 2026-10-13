@@ -8,16 +8,26 @@ import kotlinx.serialization.Serializable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.zs.compose.foundation.JetBlack
+import com.zs.compose.foundation.MetroGreen
+import com.zs.compose.foundation.SkyBlue
+import com.zs.compose.foundation.decorator.decorator
+import com.zs.compose.foundation.unit.EdgeInsets
 import com.zs.compose.theme.AppTheme
 import com.zs.compose.theme.Button
+import com.zs.compose.theme.Slider
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.text.Label
 import com.zs.compose.theme.text.Text
@@ -47,7 +57,33 @@ object RouteLevel: NavKey {
 
             val calibrated = tilt.copy(pitch = tilt.pitch - pitch, roll = tilt.roll - roll, spin = tilt.spin - spin)
             Log.d(TAG, "invoke: tilt: $tilt $calibrated")
-            BubbleLevel({ tilt }, modifier = Modifier.fillMaxSize())
+            Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+                HorizontalBubbleLevel({ tilt }, modifier = Modifier.decorator(
+                    backgroundColor = Color.JetBlack,
+                    elevation = 21.dp,
+                    shape = CircleShape,
+                    edgeInsets = EdgeInsets(horizontal = 20.dp, vertical = 20.dp),
+                    noiseAlpha = 0.5f
+                ))
+
+                Row() {
+                    BubbleLevel({ tilt }, modifier = Modifier.decorator(
+                        backgroundColor = Color.JetBlack,
+                        elevation = 21.dp,
+                        shape = CircleShape,
+                        edgeInsets = EdgeInsets(horizontal = 20.dp, vertical = 20.dp),
+                        noiseAlpha = 0.5f
+                    ))
+
+                    VerticalBubbleLevel({ tilt }, modifier = Modifier.decorator(
+                        backgroundColor = Color.JetBlack,
+                        elevation = 21.dp,
+                        shape = CircleShape,
+                        edgeInsets = EdgeInsets(horizontal = 20.dp, vertical = 20.dp),
+                        noiseAlpha = 0.5f
+                    ))
+                }
+            }
             Button(onClick = { preferences[KEY_CALIBRATION] =  rawTilt}) {
                 Label("Calibrate")
             }
