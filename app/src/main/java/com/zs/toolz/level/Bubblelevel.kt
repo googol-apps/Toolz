@@ -355,7 +355,6 @@ fun BubbleLevel(
     style: TextStyle = AppTheme.typography.title1.copy(fontFamily = Res.font.orbitron)
 ) {
     val textMeasurer = rememberTextMeasurer(cacheSize = 32)
-
     Canvas(modifier = modifier) {
         val t = tilt().takeOrElse { Tilt.Zero }
 
