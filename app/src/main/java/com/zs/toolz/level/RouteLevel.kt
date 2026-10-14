@@ -9,6 +9,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
@@ -22,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.zs.compose.foundation.JetBlack
 import com.zs.compose.foundation.MetroGreen
+import com.zs.compose.foundation.MetroGreen2
 import com.zs.compose.foundation.SkyBlue
 import com.zs.compose.foundation.decorator.decorator
 import com.zs.compose.foundation.unit.EdgeInsets
@@ -58,25 +60,26 @@ object RouteLevel: NavKey {
             val calibrated = tilt.copy(pitch = tilt.pitch - pitch, roll = tilt.roll - roll, spin = tilt.spin - spin)
             Log.d(TAG, "invoke: tilt: $tilt $calibrated")
             Column (modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
-                HorizontalBubbleLevel({ tilt }, modifier = Modifier.decorator(
+                TubeLevel({ tilt }, orientation = Orientation.Horizontal, modifier = Modifier.decorator(
                     backgroundColor = Color.JetBlack,
                     elevation = 21.dp,
                     shape = CircleShape,
+
                     edgeInsets = EdgeInsets(horizontal = 20.dp, vertical = 20.dp),
                     noiseAlpha = 0.5f
                 ))
 
                 Row() {
-                    BubbleLevel({ tilt }, modifier = Modifier.decorator(
-                        backgroundColor = Color.JetBlack,
+                    SurfaceLevel({ tilt }, tint = Color.Black, contentColor = AppTheme.colors.accent, modifier = Modifier.decorator(
+                        backgroundColor = AppTheme.colors.background(10.dp),
                         elevation = 21.dp,
                         shape = CircleShape,
                         edgeInsets = EdgeInsets(horizontal = 20.dp, vertical = 20.dp),
                         noiseAlpha = 0.5f
                     ))
 
-                    VerticalBubbleLevel({ tilt }, modifier = Modifier.decorator(
-                        backgroundColor = Color.JetBlack,
+                    TubeLevel({ tilt }, orientation = Orientation.Vertical, tint = AppTheme.colors.accent, contentColor = Color.Black, modifier = Modifier.decorator(
+                        backgroundColor = AppTheme.colors.background(10.dp),
                         elevation = 21.dp,
                         shape = CircleShape,
                         edgeInsets = EdgeInsets(horizontal = 20.dp, vertical = 20.dp),
