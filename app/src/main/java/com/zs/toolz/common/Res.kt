@@ -172,6 +172,7 @@ object Res {
     typealias string = com.zs.toolz.R.string
     typealias drawable = com.zs.toolz.R.drawable
     typealias array = com.zs.toolz.R.array
+    typealias raw = com.zs.toolz.R.raw
     typealias font = FontFamily.Companion
     typealias layout = Arrangement
     // typealias raw = com.zs.toolz.R.raw
