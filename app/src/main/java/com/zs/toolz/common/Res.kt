@@ -116,6 +116,7 @@ val FontFamily.Companion.orbitron get() = Orbitron
 
 // Pre-configured global spacing arrangements using common spacing dimensions.
 private val LargeArrangement = Arrangement.spacedBy(Res.space.large)
+private val xLargeArrangement = Arrangement.spacedBy(Res.space.x_large)
 private val SmallArrangement = Arrangement.spacedBy(Res.space.small)
 private val xSmallArrangement = Arrangement.spacedBy(Res.space.x_small)
 private val mediumArrangement = Arrangement.spacedBy(Res.space.medium)
@@ -125,6 +126,7 @@ val Arrangement.gap_large get() =  LargeArrangement
 val Arrangement.gap_small get() =  SmallArrangement
 val Arrangement.gap_x_small get() =  xSmallArrangement
 val Arrangement.gap_medium get() =  mediumArrangement
+val Arrangement.gap_x_large get() =  xLargeArrangement
 
 
 /**

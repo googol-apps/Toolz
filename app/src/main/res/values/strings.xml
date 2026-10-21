@@ -494,4 +494,5 @@
     <string name="from">from</string>
     <string name="equals_to">equals to</string>
     <string name="about_equals">About Equals</string>
+    <string name="scr_bubble_level_title">Bubble <b>Level</b><font size="10"> <sup><sup>\nReal-time tilt and balance detection.</sup></sup> </font></string>
 </resources>

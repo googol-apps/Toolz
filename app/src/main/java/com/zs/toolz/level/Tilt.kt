@@ -6,13 +6,16 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LongState
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import java.util.Locale
 import kotlin.math.PI
 import kotlin.math.asin
@@ -223,7 +226,10 @@ value class Tilt(val rawValue: Long) {
         @Stable
         val Unspecified = Tilt(Float.NaN, Float.NaN, Float.NaN)
 
-        @Stable infix fun Long.of(tag: Companion): Tilt = Tilt(this)
+        /**
+         * Packs rawTilt as [Tilt]
+         */
+        @Stable infix fun LongState.by(tag: Companion): Tilt = Tilt(this.longValue)
     }
 }
 
@@ -245,195 +251,121 @@ fun Tilt(pitch: Float, roll: Float, spin: Float): Tilt {
 }
 
 /**
- * Live, smoothed [Tilt] (pitch, roll, spin) of the phone, as Compose state.
+ * Device tilt from the accelerometer, packed as a [Tilt] in one Long (no boxing).
  *
- * The state holds [Tilt.rawValue]; wrap it with `Tilt(raw)` to read the angles.
- * It starts at zero (level) until the first reading arrives. When the device has no
- * accelerometer it holds [Tilt.Unspecified], the "not a number" value of a packed
- * Tilt (a Long cannot hold a real NaN). No calibration is applied here.
+ * - Pitch: forward/back, -90..90. Roll: left/right, -180..180. Spin: turn on a flat surface, -90..90.
+ * - Angles follow the phone body, not screen rotation (same pose, same angles in portrait/landscape).
+ * - Calibration offsets are NOT applied here; subtract them per orientation at the call site.
+ * - Emits [Tilt.Unspecified] if the device has no accelerometer.
+ * - Samples only while the lifecycle is RESUMED.
  *
- * ```
- * val raw = rememberTilt()
- * BubbleLevel(tilt = { Tilt(raw.longValue) })
- * ```
- *
- * @param filterWindowMs smoothing time in milliseconds: the time to cover 63% of a
- * sudden change (95% in three times this). About 150 feels like a liquid settling;
- * lower is quicker but shakier. 0 turns smoothing off.
+ * @param samplingPeriodUs sensor delay; rates above 200 Hz need HIGH_SAMPLING_RATE_SENSORS on API 31+.
+ * @param filterWindowMs smoothing time constant (~63% of a step change after this long); 0 disables.
  */
 @Composable
 fun rememberDeviceTilt(
-    sensorDelayUs: Int = SensorManager.SENSOR_DELAY_GAME,
+    samplingPeriodUs: Int = SensorManager.SENSOR_DELAY_GAME,
     filterWindowMs: Long = 150L
 ): LongState {
-    // ═══════════════════════════ OVERVIEW ═══════════════════════════
-    // How it works, in simple words:
-    //   1. The accelerometer feels gravity, which always pulls straight down.
-    //      Which way gravity points inside the phone tells us how the phone is tilted.
-    //      (Strictly, the sensor reports the reaction force, so a phone lying face up
-    //      reads z of about +9.8. Only the direction matters here, so that's fine.)
-    //   2. The raw reading shakes a little, so we smooth it (like a liquid settling).
-    //   3. From the smoothed gravity we compute three angles and pack them into one Long.
-    //
-    // Data flow:
-    //   sensor event -> reject glitches -> low-pass filter -> angles -> packed Long state
-    //   -> read by the level composables in their draw phase (no recomposition).
-
-    // ═══════════════════════════ CONTEXT ═══════════════════════════
     val context = LocalContext.current
+    val owner = LocalLifecycleOwner.current
 
-    // ═══════════════════════════ STATE ═══════════════════════════
-    // The packed angles as one primitive Long (no boxing, so no allocation on each of the
-    // ~50 readings per second). Starts at zero (level), so the screen shows "level" until
-    // the first reading arrives. Needs Compose runtime 1.5+.
-    //
-    // Consequence: anything that reacts to "level" (sound, vibration) can trigger once
-    // right at startup. Start from Tilt.Unspecified instead if that matters.
-    val tilt = remember { mutableLongStateOf(Tilt.Zero.rawValue) }
-
-    // ═══════════════════════════ EFFECT ═══════════════════════════
-    // Registers the sensor on RESUME and unregisters on PAUSE (or when this leaves the
-    // composition), so nothing runs, and no battery is used, while the app is in the
-    // background. Restarts if one of the keys changes.
-    //
-    // Everything declared inside (listener, filter state) is recreated on every resume,
-    // so each registration starts with a clean filter and never blends in old readings.
-    LifecycleResumeEffect(context, sensorDelayUs, filterWindowMs) {
-        // applicationContext avoids holding on to an Activity from inside the effect.
+    // Starts level until the first reading. Needs Compose runtime 1.5+ (mutableLongStateOf).
+    val tilt = remember { mutableLongStateOf(Tilt(0f, 0f, 0f).rawValue) }
+    // Register and observe
+    DisposableEffect(samplingPeriodUs, filterWindowMs) {
+        // applicationContext: never hold an Activity.
         val sensorManager =
             context.applicationContext.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-        // ── Sensor availability ──
-        // Null when the device has no accelerometer: report Unspecified (the "NaN" of a
-        // packed Tilt) so the UI can tell "unknown" apart from "level", then stop.
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         if (accelerometer == null) {
             tilt.longValue = Tilt.Unspecified.rawValue
-            return@LifecycleResumeEffect onPauseOrDispose { }
+            return@DisposableEffect onDispose { }
         }
 
         val listener = object : SensorEventListener {
-            // The smoothed gravity (fx, fy, fz) and the time of the last reading.
-            // They live here so every new registration starts fresh. Plain vars are safe:
-            // sensor callbacks arrive one at a time on the same thread.
+            // Smoothed gravity vector and last timestamp; reset on every (re)registration.
             private var fx = 0f
             private var fy = 0f
             private var fz = 0f
             private var lastTimestampNs = 0L
 
+            fun reset() {
+                lastTimestampNs = 0L
+            }
+
             override fun onSensorChanged(event: SensorEvent) {
-                // Gravity as felt by the phone, as an arrow with three parts, in the
-                // phone's own axes (they do not change when the screen rotates):
-                //   x across the screen (to the right), y up the screen, z out of the screen.
+                // Gravity as felt by the phone: x across screen, y up screen, z out of screen.
                 val x = event.values[0]
                 val y = event.values[1]
                 val z = event.values[2]
 
-                // ── Step 1: throw away broken readings ──
-                // rawG is the length of the gravity arrow (3D Pythagoras). A phone at
-                // rest always feels about 9.8 (Earth's pull), so a healthy reading is
-                // a positive, finite number. A length of 0, NaN or infinity means the
-                // sensor glitched. If any one of x, y, z is NaN or infinite, rawG is
-                // too, so a single check catches all three. The test is written
-                // "not (good)" because every comparison with NaN is false, so this
-                // also rejects NaN.
-                // Must come BEFORE smoothing: one bad number would poison it forever,
-                // because every later value is blended with the previous one.
-                // Returning here keeps the last good value on screen.
+                // 1. Reject glitches BEFORE smoothing (one bad value would poison the filter).
+                // A resting phone reads ~9.8; the negated check also rejects NaN, and a NaN/inf
+                // in any axis makes rawG NaN/inf.
                 val rawG = sqrt(x * x + y * y + z * z)
                 if (!(rawG > 0f && rawG < Float.POSITIVE_INFINITY)) return
 
-                // ── Step 2: smooth the gravity ──
-                // (fx, fy, fz is the smoothed copy.)
-                // Think of the smoothed value as a heavy ball on a rubber band: the
-                // raw reading tugs it, but it only moves part of the way each time.
-                //   new = old + alpha * (reading - old)
-                // alpha is between 0 and 1: 0.1 means "move 10% of the way toward the
-                // reading". Quick random shakes (up, down, up, down) tug in opposite
-                // directions and cancel out. A real tilt keeps tugging the same way,
-                // so the value follows it, just a little late.
-                //
-                // alpha = dt / (smoothingTime + dt), where dt is the time since the
-                // last reading. A longer wait means a bigger step, so the result feels
-                // the same at any sampling rate. After smoothingTime the value has
-                // covered 63% of a sudden change, and 95% after three times that.
-                // Trade-off: a bigger filterWindowMs is steadier but makes the bubble
-                // lag behind the phone.
-                //
-                // We smooth the gravity, not the angles: roll jumps from +180 to -180
-                // and averaging those would give 0, while gravity averages cleanly.
+                // 2. Low-pass filter on gravity: new = old + alpha * (reading - old).
+                // alpha = dt / (tau + dt) keeps the response independent of sampling rate.
+                // Filter the vector, not the angles: roll wraps at +-180 and averages badly.
                 if (lastTimestampNs == 0L) {
-                    // First reading: start right there instead of rising from zero.
+                    // First sample: start at the reading instead of rising from zero.
                     fx = x
                     fy = y
                     fz = z
                 } else {
-                    // Event timestamps are in nanoseconds; coerceAtLeast guards against a
-                    // negative gap if timestamps ever arrive out of order.
                     val dt = (event.timestamp - lastTimestampNs).coerceAtLeast(0L).toFloat()
-                    val smoothingNs = filterWindowMs * 1_000_000f
-                    // 0 (or negative) window means "no smoothing": jump straight to the reading.
-                    val alpha = if (filterWindowMs <= 0L) 1f else dt / (smoothingNs + dt)
+                    val tauNs = filterWindowMs * 1_000_000f
+                    val alpha = if (filterWindowMs <= 0L) 1f else dt / (tauNs + dt)
                     fx += alpha * (x - fx)
                     fy += alpha * (y - fy)
                     fz += alpha * (z - fz)
                 }
                 lastTimestampNs = event.timestamp
 
-                // ── Step 3: turn the smoothed gravity into angles ──
-                // Only the direction of gravity matters, so its strength g is divided out.
-                //
-                //   pitch = asin(-y / g)            tipping forward/back, -90..90
-                //   roll  = atan2(x, z)             tipping left/right, -180..180
-                //   spin  = asin(x / hypot(x, y))   turning on the table, -90..90
-                //
-                // Examples: flat on a table face up gives pitch 0, roll 0.
-                // Standing upright in portrait gives pitch of -90.
-                //
-                // The angles follow the phone's body, not the screen rotation, so a
-                // pose gives the same angles in portrait and landscape.
+                // 3. Gravity direction -> angles (magnitude g is divided out):
+                //    pitch = asin(-y / g), roll = atan2(x, z), spin = asin(x / hypot(x, y))
                 val g = sqrt(fx * fx + fy * fy + fz * fz)
                 if (!(g > 0f)) return
 
-                // coerceIn(-1, 1): tiny floating-point error can push the ratio just past
-                // 1, and asin of anything outside -1..1 is NaN.
                 val pitch = asin((-fy / g).coerceIn(-1f, 1f)) * RAD_TO_DEG
                 val roll = atan2(fx, fz) * RAD_TO_DEG
 
-                // Spin is just noise when the phone lies flat (x and y near 0), and
-                // roll is just noise when it stands on its top or bottom edge. Ignore
-                // them in those poses where the position is chosen, not here.
-                // Here, exactly 0 in-plane gravity (perfectly flat) is reported as spin 0
-                // to avoid dividing by zero.
+                // Spin is undefined when flat (x, y ~ 0) and roll when standing on an edge;
+                // callers ignore them in those poses.
                 val inPlane = hypot(fx, fy)
                 val spin =
                     if (inPlane == 0f) 0f
                     else asin((fx / inPlane).coerceIn(-1f, 1f)) * RAD_TO_DEG
 
-                // ── Step 4: pack and publish ──
-                // Pack the three angles into one Long (rounded once, at the end).
-                // Calibration offsets are NOT applied here; subtract them
-                // per position before showing the values. Keeping the raw angles here
-                // lets the same state serve calibration and display.
+                // 4. Pack once, rounding happens inside Tilt.
                 tilt.longValue = Tilt(pitch, roll, spin).rawValue
             }
 
-            // Accuracy changes (e.g. needs calibration) don't matter for a level.
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
         }
 
-        // ── Start listening ──
-        // SENSOR_DELAY_GAME is about 50 readings per second; rates
-        // above 200 Hz need HIGH_SAMPLING_RATE_SENSORS permission on Android 12+.
-        // The delay is only a hint: Android may deliver faster, which is why the filter
-        // uses real timestamps instead of assuming a fixed rate.
-        sensorManager.registerListener(listener, accelerometer, sensorDelayUs)
+        // Listen only while RESUMED. Adding the observer replays current state,
+        // so ON_RESUME fires immediately if the screen is already resumed.
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    listener.reset()
+                    sensorManager.registerListener(listener, accelerometer, samplingPeriodUs)
+                }
+                Lifecycle.Event.ON_PAUSE -> sensorManager.unregisterListener(listener)
+                else -> Unit
+            }
+        }
+        owner.lifecycle.addObserver(observer)
 
-        // Runs on PAUSE, on leaving the composition, and before the effect restarts
-        // because a key changed. Always release the sensor: a forgotten listener keeps
-        // the hardware awake and drains the battery.
-        onPauseOrDispose { sensorManager.unregisterListener(listener) }
+        onDispose {
+            owner.lifecycle.removeObserver(observer)
+            sensorManager.unregisterListener(listener)
+        }
     }
-
+    // return the tilt.
     return tilt
 }
