@@ -105,11 +105,11 @@ fun Toolz(
             modifier = Modifier.renderInSharedTransitionScopeOverlay(0.3f),
             content = {
                 val colors = NavigationItemDefaults.colors(
-                    selectedIndicatorColor = AppTheme.colors.onAccent.copy(ContentAlpha.indication),
-                    selectedTextColor = AppTheme.colors.onAccent,
+                    selectedIndicatorColor = AppTheme.colors.accent,
+                    selectedTextColor = AppTheme.colors.accent,
                     selectedIconColor = AppTheme.colors.onAccent,
-                    unselectedTextColor = AppTheme.colors.onAccent,
-                    unselectedIconColor = AppTheme.colors.onAccent,
+                    unselectedTextColor = AppTheme.colors.accent,
+                    unselectedIconColor = AppTheme.colors.accent,
                 )
                 // Unit Converter
                 BottomNavigationItem(

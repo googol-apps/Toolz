@@ -47,8 +47,8 @@ firebase-crashlytics-ktx = { module = "com.google.firebase:firebase-crashlytics-
 
 # ─── Ads & Monetization ───
 # Unity Ads SDKs for mediation and ad quality
-unity_ads_mediation = { module = "com.unity3d.ads-mediation:mediation-sdk", version = "9.6.1" }
-unity_ads_adquality = { module = "com.unity3d.ads-mediation:adquality-sdk", version = "9.10.0" }
+unity_ads_mediation = { module = "com.unity3d.ads-mediation:mediation-sdk", version = "9.7.0" }
+unity_ads_adquality = { module = "com.unity3d.ads-mediation:adquality-sdk", version = "9.11.0" }
 
 # ─── Jetpack Compose ───
 # Compose UI, tooling, and icons
@@ -105,8 +105,8 @@ androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version =
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version = "3.5.1" }
 
 
-kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version = "1.11.0" }
-kotlinx-serialization-protobuf = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-protobuf", version = "1.11.0" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version = "1.12.0" }
+kotlinx-serialization-protobuf = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-protobuf", version = "1.12.0" }
 
 
 [bundles]

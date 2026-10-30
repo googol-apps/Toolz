@@ -1,5 +1,6 @@
 package com.zs.toolz.converter
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,11 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.zs.compose.foundation.Background
@@ -46,7 +46,6 @@ import com.zs.compose.theme.adaptive.TwoPane
 import com.zs.compose.theme.adaptive.VerticalTwoPaneStrategy
 import com.zs.compose.theme.adaptive.content
 import com.zs.compose.theme.appbar.TopAppBar
-import com.zs.compose.theme.drawHorizontalDivider
 import com.zs.compose.theme.text.Header
 import com.zs.compose.theme.text.Label
 import com.zs.domain.math.NumUtil
@@ -59,10 +58,11 @@ import androidx.compose.foundation.layout.WindowInsetsSides.Companion as WIS
 private val FieldPadding = Modifier.padding(horizontal = Res.space.x_large)
 private val CompactFieldPadding = Modifier.padding(horizontal = Res.space.small)
 
-private val PortraitStrategy =  VerticalTwoPaneStrategy(0.60f)
-private val LandscapeStrategy =  HorizontalTwoPaneStrategy(0.55f)
+private val PortraitStrategy = VerticalTwoPaneStrategy(0.60f)
+private val LandscapeStrategy = HorizontalTwoPaneStrategy(0.55f)
 private val DefaultExtras = UnifiedReal.ZERO to AnnotatedString("")
-private val AboutEqualsPadding = PaddingValues(start = Res.space.large, end = Res.space.large, top = Res.space.medium)
+private val AboutEqualsPadding =
+    PaddingValues(start = Res.space.large, end = Res.space.large, top = Res.space.medium)
 
 @Serializable
 object RouteUnitConverter : NavKey {
@@ -97,11 +97,13 @@ object RouteUnitConverter : NavKey {
             secondary = {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
-                    modifier = Modifier.windowInsetsPadding(
-                        navBarInsets.union(WindowInsets.navigationBars).only(
-                            WIS.Bottom + WIS.End
-                        ).run { if (!portrait) add(WindowInsets(bottom = Res.space.normal)) else this }
-                    )
+                    modifier = Modifier
+                        .windowInsetsPadding(
+                            navBarInsets.union(WindowInsets.navigationBars).only(
+                                WIS.Bottom + WIS.End
+                            )
+                                .run { if (!portrait) add(WindowInsets(bottom = Res.space.normal)) else this }
+                        )
                         .padding(horizontal = if (portrait) Res.space.x_large else Res.space.small)
                         .fillMaxSize(),
 
@@ -116,26 +118,18 @@ object RouteUnitConverter : NavKey {
             },
             topBar = {
                 TopAppBar(
-                    background = Background(Color.Transparent),
-                    modifier = Modifier
-                        .drawHorizontalDivider(
-                            thickness = 1.dp,
-                            color = AppTheme.colors.onBackground,
-                            indent = DpOffset(Res.space.x_large, Res.space.x_large)
-                        )
-                        .padding(bottom = 5.dp),
-                    navigationIcon = {
-                        Icon(
-                            vectorResource(Res.drawable.ic_handyman),
-                            contentDescription = null,
-                            modifier = Modifier.size(22.dp)
-                        )
-                    },
                     title = {
                         Label(
                             textResource(Res.string.scr_unit_converter_title),
                             fontWeight = FontWeight.Light,
                             maxLines = 2
+                        )
+                    },
+                    navigationIcon = {
+                        Icon(
+                            vectorResource(Res.drawable.ic_handyman),
+                            contentDescription = null,
+                            modifier = Modifier.size(22.dp)
                         )
                     },
                     actions = {
@@ -155,7 +149,18 @@ object RouteUnitConverter : NavKey {
                             )
                         }
                         Spacer(Modifier.width(Res.space.medium))
-                    }
+                    },
+                    background = Background(
+                        Modifier.background(
+                            Brush.verticalGradient(
+                                listOf(
+                                    AppTheme.colors.background(20.dp),
+                                    AppTheme.colors.background(10.dp),
+                                    AppTheme.colors.background(0.dp)
+                                )
+                            )
+                        )
+                    )
                 )
             },
             primary = {
@@ -165,7 +170,7 @@ object RouteUnitConverter : NavKey {
                         .windowInsetsPadding(
                             WindowInsets.content.union(navBarInsets).only(WIS.Top + WIS.Start)
                         )
-                        .padding(vertical = Res.space.normal )
+                        .padding(vertical = Res.space.normal)
                         .fillMaxSize(),
                     content = {
                         Converters(
@@ -187,7 +192,11 @@ object RouteUnitConverter : NavKey {
                         }
                         val (conversion, more) = result
                         ResultField(
-                            NumUtil.doubleToString(conversion.doubleValue(), MAX_ALLOWED_CHARS, 2)!!,
+                            NumUtil.doubleToString(
+                                conversion.doubleValue(),
+                                MAX_ALLOWED_CHARS,
+                                2
+                            )!!,
                             viewState,
                             modifier = if (portrait) FieldPadding else CompactFieldPadding,
                         )
@@ -204,7 +213,11 @@ object RouteUnitConverter : NavKey {
                         Label(
                             more,
                             style = AppTheme.typography.label3,
-                            modifier = FieldPadding.then(Modifier.horizontalScroll(rememberScrollState()))
+                            modifier = FieldPadding.then(
+                                Modifier.horizontalScroll(
+                                    rememberScrollState()
+                                )
+                            )
                         )
                     }
                 )

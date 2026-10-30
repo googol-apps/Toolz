@@ -40,7 +40,7 @@ private val BottomBarBorder =  BorderStroke(
     1.dp,
     Brush.verticalGradient(
         listOf(
-            Color.Gray,
+            Color.Gray.copy(0.24f),
             Color.Transparent,
             Color.Transparent,
             Color.Transparent,
@@ -61,7 +61,7 @@ fun NavigationBar(
                 content = { content() }, modifier = Modifier
                     .pointerInput(Unit, {})
                     .decorator(
-                        AppTheme.colors.accent,
+                        AppTheme.colors.background(10.dp),
                         elevation = 4.dp,
                         shape = EndConcaveShape(16.dp),
                         noiseAlpha = 0.4f,
@@ -78,7 +78,7 @@ fun NavigationBar(
                 content = { content() }, modifier = Modifier
                     .pointerInput(Unit, {})
                     .decorator(
-                        AppTheme.colors.accent,
+                        AppTheme.colors.background(10.dp),
                         elevation = 4.dp,
                         shape = TopConcaveShape(16.dp),
                         noiseAlpha = 0.4f,
