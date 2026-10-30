@@ -18,7 +18,6 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.zs.compose.foundation.textResource
 import com.zs.compose.theme.AppTheme
-import com.zs.compose.theme.ContentAlpha
 import com.zs.compose.theme.Icon
 import com.zs.compose.theme.LocalWindowSize
 import com.zs.compose.theme.MotionScheme
@@ -37,12 +36,13 @@ import com.zs.toolz.common.NightMode
 import com.zs.toolz.common.Res
 import com.zs.toolz.common.compose.NavigationBar
 import com.zs.toolz.common.geom
+import com.zs.toolz.common.impl.SettingsViewModel
 import com.zs.toolz.common.impl.UnitConverterViewModel
 import com.zs.toolz.common.preference
 import com.zs.toolz.common.vectorResource
 import com.zs.toolz.converter.RouteUnitConverter
 import com.zs.toolz.level.RouteLevel
-import com.zs.toolz.settings.Settings
+import com.zs.toolz.settings.RouteSettings
 import org.koin.androidx.compose.koinViewModel
 import com.zs.compose.theme.snackbar.SnackbarHostState as SnackbarController
 
@@ -57,6 +57,7 @@ private val NavGraphBuilder = { key: NavKey ->
         // If the route is AppIntro, show the AppIntro composable.
         RouteUnitConverter -> NavEntry(key) { RouteUnitConverter(koinViewModel<UnitConverterViewModel>()) }
         RouteLevel -> NavEntry(key) { RouteLevel() }
+        RouteSettings -> NavEntry(key) { RouteSettings(koinViewModel<SettingsViewModel>()) }
 
         // --- Fallback ---
         // For any unhandled route, throw a TODO to indicate missing implementation.
@@ -141,8 +142,8 @@ fun Toolz(
 
                 // Settings
                 BottomNavigationItem(
-                    selected = entry is Settings,
-                    onClick = { navController.navigate(Settings) },
+                    selected = entry is RouteSettings,
+                    onClick = { navController.navigate(RouteSettings) },
                     label = { Label(textResource(Res.string.settings)) },
                     colors = colors,
                     icon = {

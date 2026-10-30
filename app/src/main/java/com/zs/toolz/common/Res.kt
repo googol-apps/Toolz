@@ -252,10 +252,7 @@ object Res {
     object key {
         val night_mode_policy =
             intPreferenceKey("_night_mode", NightMode.FOLLOW_SYSTEM, OrdinalEnumSaver())
-        val transparent_system_bars = booleanPreferenceKey(
-            "_transparent_system_bars",
-            defaultValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
-        )
+        val transparent_system_bars = booleanPreferenceKey("_transparent_system_bars", defaultValue = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         val app_launch_counter = intPreferenceKey("_launch_counter", 0)
         val dynamic_colors =
             booleanPreferenceKey("_dynamic_colors", app.isAtLeast(Build.VERSION_CODES.S))

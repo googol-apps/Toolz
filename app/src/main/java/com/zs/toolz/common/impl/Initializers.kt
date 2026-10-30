@@ -122,4 +122,5 @@ private val AppModules = module {
 
     // --- ViewModels ---
     viewModelOf(::UnitConverterViewModel)
+    viewModelOf(::SettingsViewModel)
 }
